@@ -1,4 +1,6 @@
 # LazyComposer
 Simple midi music generator
 
-![image](misc/screenshot1.png?raw=true)
+<p align="center">
+  <img src="misc/screenshot1.png">
+</p>
