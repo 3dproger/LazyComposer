@@ -9,3 +9,4 @@ Simple midi music generator
 * Make sure your PC supports midi playback
 * You can also switch tracks and save songs to file
 * Examples of songs can be found in [this folder](examples)
+* <b><a href="/../../releases">Download</a></b>
