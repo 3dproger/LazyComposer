@@ -134,7 +134,7 @@ QList<MidiPlayer::DeviceInfo> MidiPlayer::devices() const
     QList<DeviceInfo> devicesInfo;
     const QMap<QString, QString>& devices = QMidiOut::devices();
 
-    for (const QString deviceId : devices)
+    for (const QString deviceId : devices.keys())
     {
         DeviceInfo info;
 
