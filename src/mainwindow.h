@@ -58,6 +58,10 @@ private slots:
 
     void playStarted(Composition*);
 
+    void onDevicesChanged();
+
+    void onSelectDeviceTriggered();
+
 protected:
     void closeEvent(QCloseEvent *event);
 

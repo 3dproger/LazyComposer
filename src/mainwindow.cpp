@@ -9,6 +9,7 @@
 #include "windowmidistructure.h"
 #include <QMessageBox>
 #include "defaults.h"
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(_midiPlayer, SIGNAL(updateProgress(int, int)), this, SLOT(updatePlayerProgress(int, int)));
     connect(_midiPlayer, SIGNAL(stopPlayingSignal()), this, SLOT(playingStopSlot()));
     connect(_midiPlayer, SIGNAL(playStarted(Composition*)), this, SLOT(playStarted(Composition*)));
+    connect(_midiPlayer, &MidiPlayer::devicesChanged, this, &MainWindow::onDevicesChanged);
+    onDevicesChanged();
 
     ui->progressBarComposition->setValue(0);
 
@@ -249,6 +252,52 @@ void MainWindow::playStarted(Composition* composition)
     if (!found)
     {
         qDebug(QString("MainWindow::playStarted(Composition*): Title \"%1\" not found in ui->listWidgetCompositions").arg(composition->title).toUtf8());
+    }
+}
+
+void MainWindow::onDevicesChanged()
+{
+    ui->menuMidiDevice->clear();
+
+    if (!_midiPlayer->devices().isEmpty())
+    {
+        for (const auto& device : _midiPlayer->devices())
+        {
+            QAction* action = new QAction(device.name, ui->menuMidiDevice);
+            if (device.isConnected)
+            {
+                action->setIcon(QIcon(":/resources/images/play.svg"));
+            }
+
+            action->setData(device.id);
+            connect(action, &QAction::triggered, this, &MainWindow::onSelectDeviceTriggered);
+            ui->menuMidiDevice->addAction(action);
+        }
+    }
+    else
+    {
+        QAction* action = new QAction(tr("MIDI devices not found"), ui->menuMidiDevice);
+        action->setEnabled(false);
+        ui->menuMidiDevice->addAction(action);
+    }
+}
+
+void MainWindow::onSelectDeviceTriggered()
+{
+    QAction* action = qobject_cast<QAction*>(sender());
+    if (action)
+    {
+        if (!_midiPlayer->setDevice(action->data().toString()))
+        {
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("Failed to connect MIDI device \"%1\", deviceId: \"%2\"")
+                                  .arg(action->text())
+                                  .arg(action->data().toString()));
+        }
+    }
+    else
+    {
+        qCritical() << Q_FUNC_INFO << ": action == nullptr";
     }
 }
 

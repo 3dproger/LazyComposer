@@ -223,7 +223,13 @@
     </property>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuMidiDevice">
+    <property name="title">
+     <string>Midi Device</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuMidiDevice"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="actionOpenMIDI">
