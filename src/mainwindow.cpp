@@ -60,6 +60,8 @@ void MainWindow::on_btnPlay_clicked(){
         _currentTrack = _midiStorage.compositions().indexOf(composition);
         playNext();
     }
+
+    _midiPlayer->setPause(false);
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -287,12 +289,15 @@ void MainWindow::onSelectDeviceTriggered()
     QAction* action = qobject_cast<QAction*>(sender());
     if (action)
     {
+        QString deviceName = action->text();
+        QString deviceId   = action->data().toString();
+
         if (!_midiPlayer->setDevice(action->data().toString()))
         {
             QMessageBox::critical(this, tr("Error"),
                                   tr("Failed to connect MIDI device \"%1\", deviceId: \"%2\"")
-                                  .arg(action->text())
-                                  .arg(action->data().toString()));
+                                  .arg(deviceName)
+                                  .arg(deviceId));
         }
     }
     else

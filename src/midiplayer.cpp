@@ -18,10 +18,9 @@ MidiPlayer::MidiPlayer(QObject *parent) : QObject(parent)
 
 MidiPlayer::~MidiPlayer()
 {
-    //_mutex.lock();
+    QMutexLocker locker(&_mutex);
     _midiOut.stopAll();
     _midiOut.disconnect();
-    //_mutex.unlock();
 
     emit devicesChanged();
 }
@@ -35,57 +34,70 @@ void MidiPlayer::run()
 {
     while (true)
     {
-        //_mutex.lock();
+        _mutex.lock();
         _midiOut.stopAll();
-        //_mutex.unlock();
+        _currentTime = 0;
 
-        if (_composition && _composition->midi) {
-            qDebug(QString("Start Playing. Events: %1, time: %2 sec").arg(_events.count()).arg(double(_maxTime) / 1000.0).toUtf8());
+        if (_composition && _composition->midi)
+        {
+            qDebug(QString("Start Playing. Events: %1, time: %2 sec")
+                   .arg(_events.count()).arg(double(_maxTime) / 1000.0).toUtf8());
 
-            for (_currentPosition = 0; _currentPosition < _events.count(); _currentPosition += 1){
-                //_mutex.lock();
+            _mutex.unlock();
+
+            for (_currentPosition = 0; _currentPosition < _events.count(); _currentPosition += 1)
+            {
+                _mutex.lock();
 
                 if (_needExit){
-                    //_mutex.unlock();
+                    _mutex.unlock();
                     return;
                 }
 
                 if (!_composition || !_composition->midi || _needStop)
                 {
-                    //_mutex.unlock();
+                    _mutex.unlock();
                     break;
                 }
 
                 if (_pause)
                 {
                     _currentPosition -= 1;
-                    //_mutex.unlock();
+                    _mutex.unlock();
                     QThread::msleep(50);
                     continue;
                 }
 
                 QMidiEvent* e = _events.at(_currentPosition);
 
-                if (e->type() != QMidiEvent::Meta) {
-                    quint64 eventTime = qint64(_composition->midi->timeFromTick(e->tick()) * 1000.0f);
+                if (e->type() != QMidiEvent::Meta)
+                {
+                    _currentTime = qint64(_composition->midi->timeFromTick(e->tick()) * 1000.0f);
 
-                    qint32 waitTime = eventTime - _elapsedTime.elapsed();
-                    if (waitTime > 0) {
-                        //ToDo: предусмотреть выход, если пауза слишком большая
-                        //_mutex.unlock();
+                    qint32 waitTime = _currentTime - _elapsedTime.elapsed();
+                    if (waitTime > 0)
+                    {
+                        //ToDo: предусмотреть выход, если задержка слишком большая
+                        _mutex.unlock();
                         QThread::msleep(uint32_t(waitTime));
-                        //_mutex.lock();
+                        _mutex.lock();
                     }
-                    if (e->type() == QMidiEvent::SysEx) {
+                    if (e->type() == QMidiEvent::SysEx)
+                    {
                         // TODO: sysex
-                    } else {
+                    } else
+                    {
                         qint32 message = e->message();
                         _midiOut.sendMsg(message);
                     }
 
-                    emit updateProgress(eventTime, _maxTime);
+                    emit updateProgress(_currentTime, _maxTime);
                 }
+
+                _mutex.unlock();
             }
+
+            _mutex.lock();
 
             qDebug(QString("End Playing").toUtf8());
 
@@ -97,17 +109,21 @@ void MidiPlayer::run()
                 _composition = nullptr;
             }
 
-            //_mutex.unlock();
+            _mutex.unlock();
         }
+
+        _mutex.unlock();
 
         QThread::msleep(50);
 
-        //_mutex.lock();
+        _mutex.lock();
         if (_needExit)
         {
-            //_mutex.unlock();
+            _currentTime = 0;
+            _mutex.unlock();
             return;
         }
+        _mutex.unlock();
     }
 }
 
@@ -124,7 +140,7 @@ QList<MidiPlayer::DeviceInfo> MidiPlayer::devices() const
         info.id = deviceId;
         info.name = devices.value(deviceId);
 
-        if (!_currentDevice.id.isEmpty() && info.id ==_currentDevice.id)
+        if (!_currentDevice.id.isEmpty() && info.id == _currentDevice.id)
         {
             info.isConnected = true;
         }
@@ -147,13 +163,13 @@ MidiPlayer::DeviceInfo MidiPlayer::currentDevice() const
 
 bool MidiPlayer::setDevice(const QString &deviceId)
 {
-    _mutex.lock();
+    QMutexLocker locker(&_mutex);
 
-    if (_midiOut.isConnected())
+    /*if (_midiOut.isConnected())
     {
         _midiOut.stopAll();
         _midiOut.disconnect();
-    }
+    }*/
 
     _currentDevice = DeviceInfo();
 
@@ -165,9 +181,10 @@ bool MidiPlayer::setDevice(const QString &deviceId)
         if (deviceId == device.id)
         {
             found = true;
+            _midiOut = QMidiOut();
             connected = _midiOut.connect(deviceId);
             _currentDevice = device;
-            _currentDevice.isConnected = true;
+            _currentDevice.isConnected = connected;
             break;
         }
     }
@@ -188,13 +205,13 @@ bool MidiPlayer::setDevice(const QString &deviceId)
 
     emit devicesChanged();
 
-    _mutex.unlock();
-
     return connected;
 }
 
 void MidiPlayer::play(Composition *composition)
 {
+    QMutexLocker locker(&_mutex);
+
     if (!composition || !composition->midi)
     {
         qDebug("MidiPlayer::play(): !composition || !composition->midi");
@@ -219,14 +236,15 @@ void MidiPlayer::play(Composition *composition)
 
         emit playStarted(_composition);
     }
-    else{
 
-    }
     _pause = false;
 }
 
 void MidiPlayer::setPause(bool pause)
 {
+    QMutexLocker locker(&_mutex);
+
+    //_pauseTime
     _pause = pause;
     if (_pause){
         _midiOut.stopAll();
@@ -240,6 +258,7 @@ void MidiPlayer::changePosition(float percentage)
 
 void MidiPlayer::destroy()
 {
+    QMutexLocker locker(&_mutex);
     _composition = nullptr;
     _needExit = true;
 }

@@ -41,7 +41,7 @@ public slots:
     void destroy();
 
 private:
-    quint64 calcTime(QMidiFile* _midiFile);
+    static quint64 calcTime(QMidiFile* _midiFile);
 
     QMidiOut _midiOut;
     Composition* _composition = nullptr;
@@ -56,6 +56,8 @@ private:
 
     QElapsedTimer _elapsedTime;
     quint64 _maxTime = 0;
+    quint64 _currentTime = 0;
+    quint64 _pauseTime = 0;
 
     DeviceInfo _currentDevice;
 };
