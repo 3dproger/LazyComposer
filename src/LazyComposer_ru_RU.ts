@@ -26,8 +26,8 @@
     <message>
         <location filename="mainwindow.ui" line="98"/>
         <location filename="mainwindow.ui" line="112"/>
-        <location filename="mainwindow.cpp" line="104"/>
-        <location filename="mainwindow.cpp" line="105"/>
+        <location filename="mainwindow.cpp" line="107"/>
+        <location filename="mainwindow.cpp" line="108"/>
         <source>0:00</source>
         <translation>0:00</translation>
     </message>
@@ -58,7 +58,7 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="137"/>
-        <location filename="mainwindow.cpp" line="189"/>
+        <location filename="mainwindow.cpp" line="192"/>
         <source>I rest</source>
         <translation>Я отдыхаю</translation>
     </message>
@@ -73,54 +73,74 @@
         <translation>Помощь</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="231"/>
+        <location filename="mainwindow.ui" line="228"/>
+        <source>Midi Device</source>
+        <translation>Midi-устройство</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="237"/>
         <source>Open MIDI...</source>
         <translation>Открыть MIDI...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="236"/>
+        <location filename="mainwindow.ui" line="242"/>
         <source>Open...</source>
         <translation>Открыть...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="241"/>
+        <location filename="mainwindow.ui" line="247"/>
         <source>Save...</source>
         <translation>Сохранить...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="246"/>
-        <location filename="mainwindow.cpp" line="183"/>
+        <location filename="mainwindow.ui" line="252"/>
+        <location filename="mainwindow.cpp" line="186"/>
         <source>About</source>
         <translation>О программе</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="89"/>
+        <location filename="mainwindow.cpp" line="92"/>
+        <location filename="mainwindow.cpp" line="292"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="89"/>
+        <location filename="mainwindow.cpp" line="92"/>
         <source>Failed to save file &quot;%1&quot;</source>
         <translation>Не удалось сохранить файл &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="118"/>
-        <location filename="mainwindow.cpp" line="123"/>
+        <location filename="mainwindow.cpp" line="121"/>
+        <location filename="mainwindow.cpp" line="126"/>
         <source>%1:%2</source>
         <translation>%1:%2</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="177"/>
-        <source>Author: Alexander Kirsanov</source>
-        <translation>Автор: Александр Кирсанов</translation>
+        <location filename="mainwindow.cpp" line="279"/>
+        <source>MIDI devices not found</source>
+        <translation>MIDI-устройства не найдены</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="179"/>
+        <location filename="mainwindow.cpp" line="293"/>
+        <source>Failed to connect MIDI device &quot;%1&quot;, deviceId: &quot;%2&quot;</source>
+        <translation>Не удалось подключиться к MIDI-устройству &quot;%1&quot;, deviceId: &quot;%2&quot;</translation>
+    </message>
+    <message>
+        <source>Author: Alexander Kirsanov</source>
+        <translation type="vanished">Автор: Александр Кирсанов</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="180"/>
         <source>Version: %1</source>
         <translation>Версия: %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="224"/>
+        <location filename="mainwindow.cpp" line="182"/>
+        <source>Alexander Kirsanov (c) %1</source>
+        <translation>Александр Кирсанов (c) %1</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="227"/>
         <source>I&apos;m writing a new track</source>
         <translation>Я пишу новый трек</translation>
     </message>

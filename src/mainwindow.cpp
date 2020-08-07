@@ -177,11 +177,11 @@ void MainWindow::on_actionAbout_triggered()
 
     s += windowTitle() + "\n";
 
-    s += tr("Author: Alexander Kirsanov") + "\n";
+    s += tr("Version: %1").arg(LazyComposer::APP_VERSION) + "\n";
 
-    s += tr("Version: %1").arg(APP_VERSION) + "\n";
+    s += tr("Alexander Kirsanov (c) %1").arg(LazyComposer::APP_YEAR) + "\n";
 
-    s += APP_YEAR;
+    s += LazyComposer::ORGANIZATION_DOMAIN;
 
     QMessageBox::about(this, tr("About"), s);
 }
