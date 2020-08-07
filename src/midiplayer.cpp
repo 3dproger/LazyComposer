@@ -38,12 +38,13 @@ void MidiPlayer::run()
         _midiOut.stopAll();
         _currentTime = 0;
         _amendmentTime = 0;
+        _mutex.unlock();
 
         if (_composition && _composition->midi)
         {
+            _mutex.lock();
             qDebug(QString("Start Playing. Events: %1, time: %2 sec")
                    .arg(_events.count()).arg(double(_maxTime) / 1000.0).toUtf8());
-
             _mutex.unlock();
 
             for (_currentPosition = 0; _currentPosition < _events.count(); _currentPosition += 1)
@@ -112,8 +113,6 @@ void MidiPlayer::run()
 
             _mutex.unlock();
         }
-
-        _mutex.unlock();
 
         QThread::msleep(50);
 
