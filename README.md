@@ -6,7 +6,7 @@ Simple midi music generator
 </p>
 
 * Just launch the program and enjoy the masterpiece music!
-* Make sure your PC supports midi playback
+* Make sure your device supports midi playback
 * You can also switch tracks and save songs to file
 * [Examples MIDI](examples)
 * <b><a href="/../../releases">Download</a></b>
