@@ -175,11 +175,6 @@ QList<MidiPlayer::DeviceInfo> MidiPlayer::devices() const
             info.isConnected = true;
         }
 
-        if (info.name.isEmpty())
-        {
-            info.name = info.id;
-        }
-
         devicesInfo.append(info);
     }
 
@@ -221,7 +216,7 @@ bool MidiPlayer::setDevice(const QString &deviceId)
 
     if (!found)
     {
-        qCritical() << Q_FUNC_INFO << ": device with id \"" + deviceId + "\" not found";
+        qCritical(QString("%1: Device %2 not found!").arg(Q_FUNC_INFO).arg(deviceId).toUtf8());
     }
 
     if (connected)
@@ -232,7 +227,8 @@ bool MidiPlayer::setDevice(const QString &deviceId)
             _settings->setValue(_settingsGroup + "/" + _settingKeyLastDeviceName, _currentDevice.name);
         }
 
-        qDebug() << Q_FUNC_INFO << ": device with id \"" + deviceId + "\" successfully connected";
+        qDebug(QString("Device %1: \"%2\" successfully connected!")
+               .arg(_currentDevice.id).arg(_currentDevice.name).toUtf8());
     }
     else
     {
@@ -242,7 +238,8 @@ bool MidiPlayer::setDevice(const QString &deviceId)
             _settings->setValue(_settingsGroup + "/" + _settingKeyLastDeviceName, "");
         }
 
-        qCritical() << Q_FUNC_INFO << ": failed to connect device with id \"" + deviceId + "\"";
+        qCritical(QString("%1: Failed to connect device %2: \"%3\"")
+               .arg(Q_FUNC_INFO).arg(_currentDevice.name).arg(_currentDevice.id).toUtf8());
     }
 
     emit devicesChanged();

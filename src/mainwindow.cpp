@@ -265,7 +265,13 @@ void MainWindow::onDevicesChanged()
     {
         for (const auto& device : _midiPlayer->devices())
         {
-            QAction* action = new QAction(device.name, ui->menuMidiDevice);
+            QString text = device.id;
+            if (!device.name.isEmpty())
+            {
+                text = device.name;
+            }
+
+            QAction* action = new QAction(text, ui->menuMidiDevice);
             if (device.isConnected)
             {
                 action->setIcon(QIcon(":/resources/images/play.svg"));
