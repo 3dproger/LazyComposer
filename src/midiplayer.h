@@ -57,7 +57,7 @@ private:
     QElapsedTimer _elapsedTime;
     quint64 _maxTime = 0;
     quint64 _currentTime = 0;
-    quint64 _pauseTime = 0;
+    quint64 _unpauseTime = 0;
 
     DeviceInfo _currentDevice;
 };
