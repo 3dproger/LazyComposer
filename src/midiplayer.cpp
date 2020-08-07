@@ -63,7 +63,7 @@ void MidiPlayer::run()
                     break;
                 }
 
-                if (_pause)
+                if (_pause || !_midiOut.isConnected())
                 {
                     _currentPosition -= 1;
                     _mutex.unlock();
