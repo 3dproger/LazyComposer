@@ -3,7 +3,14 @@
 
 #include <QString>
 
-const QString APP_VERSION = "1.0";
+namespace LazyComposer {
+const QString APP_NAME = "Lazy Composer";
+const QString ORGANIZATION_NAME = "Axel_k";
+const QString ORGANIZATION_DOMAIN = "https://github.com/3dproger";
+
+const QString APP_VERSION = "1.1";
 const QString APP_YEAR = "2019-2020";
+}
+
 
 #endif // DEFAULTS_H
