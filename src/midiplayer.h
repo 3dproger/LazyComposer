@@ -9,6 +9,7 @@
 #include "global.h"
 #include <QMutex>
 #include <QSettings>
+#include <QTimer>
 
 class MidiPlayer : public QObject, public QRunnable
 {
@@ -19,6 +20,14 @@ public:
         QString name;
         bool isConnected = false;
         bool isValid = false;
+
+        bool operator==(const DeviceInfo& other)
+        {
+            return id == other.id &&
+                    name == other.name &&
+                    isConnected == other.isConnected &&
+                    isValid == other.isValid;
+        }
     };
 
     explicit MidiPlayer(QSettings* settings, const QString& _settingsGroup, QObject *parent = nullptr);
@@ -41,6 +50,9 @@ public slots:
     void changePosition(float percentage);
     void destroy();
 
+private slots:
+    void onUpdateDevices();
+
 private:
     static quint64 calcTime(QMidiFile* _midiFile);
     QString searchDevice(const QString& deviceId, const QString& deviceName);
@@ -61,6 +73,8 @@ private:
     quint64 _currentTime = 0;
     quint64 _amendmentTime = 0;
 
+    QTimer _timerDevicesUpdate;
+    QList<DeviceInfo> _devices;
     DeviceInfo _currentDevice;
 
     QSettings* _settings = nullptr;

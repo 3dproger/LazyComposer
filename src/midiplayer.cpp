@@ -43,6 +43,10 @@ MidiPlayer::MidiPlayer(QSettings* settings, const QString& _settingsGroup, QObje
             setDevice(devices.first().id);
         }
     }
+
+    connect(&_timerDevicesUpdate, &QTimer::timeout, this, &MidiPlayer::onUpdateDevices);
+    _timerDevicesUpdate.setInterval(2000);
+    _timerDevicesUpdate.start();
 }
 
 MidiPlayer::~MidiPlayer()
@@ -307,6 +311,16 @@ void MidiPlayer::destroy()
     QMutexLocker locker(&_mutex);
     _composition = nullptr;
     _needExit = true;
+}
+
+void MidiPlayer::onUpdateDevices()
+{
+    const auto& devices = MidiPlayer::devices();
+    if (devices != _devices)
+    {
+        _devices = devices;
+        emit devicesChanged();
+    }
 }
 
 quint64 MidiPlayer::calcTime(QMidiFile *midiFile)
