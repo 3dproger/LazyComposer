@@ -14,6 +14,7 @@ MidiPlayer::MidiPlayer(QObject *parent) : QObject(parent)
     qDebug(QString("Total midi devices: %1").arg(devices.count()).toUtf8());
 
     setDevice(devices.first().id);
+    //setDevice(devices[1].id);
 }
 
 MidiPlayer::~MidiPlayer()
@@ -101,7 +102,7 @@ void MidiPlayer::run()
 
             _mutex.lock();
 
-            qDebug(QString("End Playing").toUtf8());
+            qDebug("End Playing");
 
             if (_needStop){
                 _needStop = false;
@@ -166,11 +167,11 @@ bool MidiPlayer::setDevice(const QString &deviceId)
 {
     QMutexLocker locker(&_mutex);
 
-    /*if (_midiOut.isConnected())
+    if (_midiOut.isConnected())
     {
         _midiOut.stopAll();
         _midiOut.disconnect();
-    }*/
+    }
 
     _currentDevice = DeviceInfo();
 
@@ -184,7 +185,6 @@ bool MidiPlayer::setDevice(const QString &deviceId)
             found = true;
             _midiOut = QMidiOut();
             connected = _midiOut.connect(deviceId);
-            _currentDevice = device;
             _currentDevice.isConnected = connected;
             break;
         }
