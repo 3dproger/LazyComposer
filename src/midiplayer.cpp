@@ -2,19 +2,47 @@
 #include <QThread>
 #include <QDebug>
 
-MidiPlayer::MidiPlayer(QObject *parent) : QObject(parent)
+MidiPlayer::MidiPlayer(QSettings* settings, const QString& _settingsGroup, QObject *parent)
+    : QObject(parent), _settings(settings), _settingsGroup(_settingsGroup)
 {
     const QList<DeviceInfo>& devices = MidiPlayer::devices();
 
-    qDebug("Midi devices:");
-    for (const DeviceInfo& device : devices)
+    if (_settings)
     {
-        qDebug(QString("%1: \"%2\"").arg(device.id).arg(device.name).toUtf8());
-    }
-    qDebug(QString("Total midi devices: %1").arg(devices.count()).toUtf8());
+        QString lastDeviceId   = _settings->value(_settingsGroup + "/" + _settingKeyLastDeviceId  ).toString();
+        QString lastDeviceName = _settings->value(_settingsGroup + "/" + _settingKeyLastDeviceName).toString();
 
-    setDevice(devices.first().id);
-    //setDevice(devices[1].id);
+        if (!lastDeviceId.isEmpty() || !lastDeviceName.isEmpty())
+        {
+            QString foundDeviceId = searchDevice(lastDeviceId, lastDeviceName);
+
+            if (!foundDeviceId.isEmpty())
+            {
+                setDevice(foundDeviceId);
+            }
+            else
+            {
+                if (!devices.empty())
+                {
+                    setDevice(devices.first().id);
+                }
+            }
+        }
+        else
+        {
+            if (!devices.empty())
+            {
+                setDevice(devices.first().id);
+            }
+        }
+    }
+    else
+    {
+        if (!devices.empty())
+        {
+            setDevice(devices.first().id);
+        }
+    }
 }
 
 MidiPlayer::~MidiPlayer()
@@ -185,6 +213,7 @@ bool MidiPlayer::setDevice(const QString &deviceId)
             found = true;
             _midiOut = QMidiOut();
             connected = _midiOut.connect(deviceId);
+            _currentDevice = device;
             _currentDevice.isConnected = connected;
             break;
         }
@@ -197,10 +226,22 @@ bool MidiPlayer::setDevice(const QString &deviceId)
 
     if (connected)
     {
+        if (_settings)
+        {
+            _settings->setValue(_settingsGroup + "/" + _settingKeyLastDeviceId,   _currentDevice.id);
+            _settings->setValue(_settingsGroup + "/" + _settingKeyLastDeviceName, _currentDevice.name);
+        }
+
         qDebug() << Q_FUNC_INFO << ": device with id \"" + deviceId + "\" successfully connected";
     }
     else
     {
+        if (_settings)
+        {
+            _settings->setValue(_settingsGroup + "/" + _settingKeyLastDeviceId,   "");
+            _settings->setValue(_settingsGroup + "/" + _settingKeyLastDeviceName, "");
+        }
+
         qCritical() << Q_FUNC_INFO << ": failed to connect device with id \"" + deviceId + "\"";
     }
 
@@ -291,4 +332,55 @@ quint64 MidiPlayer::calcTime(QMidiFile *midiFile)
     }
 
     return time;
+}
+
+QString MidiPlayer::searchDevice(const QString &deviceId, const QString &deviceName)
+{
+    if (deviceId.isEmpty() && deviceName.isEmpty())
+    {
+        return QString();
+    }
+
+    const QList<DeviceInfo>& devices = MidiPlayer::devices();
+
+    QList<DeviceInfo> candidates;
+
+    //Search all candidates
+    for (const auto& device : devices)
+    {
+        if (deviceId == device.id || deviceName == device.name)
+        {
+            candidates.append(device);
+        }
+    }
+
+    //Finding the most suitable
+    for (const auto& device : candidates)
+    {
+        if (deviceId == device.id && deviceName == device.name)
+        {
+            return device.id;
+        }
+    }
+
+    //The first with the same name
+    for (const auto& device : candidates)
+    {
+        if (deviceName == device.name)
+        {
+            return device.id;
+        }
+    }
+
+    //The first with the same id
+    for (const auto& device : candidates)
+    {
+        if (deviceId == device.id)
+        {
+            return device.id;
+        }
+    }
+
+    //Not found
+    return QString();
 }

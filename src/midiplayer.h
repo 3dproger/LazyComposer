@@ -8,6 +8,7 @@
 #include <QElapsedTimer>
 #include "global.h"
 #include <QMutex>
+#include <QSettings>
 
 class MidiPlayer : public QObject, public QRunnable
 {
@@ -20,7 +21,7 @@ public:
         bool isValid = false;
     };
 
-    explicit MidiPlayer(QObject *parent = nullptr);
+    explicit MidiPlayer(QSettings* settings, const QString& _settingsGroup, QObject *parent = nullptr);
     ~MidiPlayer();
     bool isPlaying();
     void run();
@@ -42,6 +43,7 @@ public slots:
 
 private:
     static quint64 calcTime(QMidiFile* _midiFile);
+    QString searchDevice(const QString& deviceId, const QString& deviceName);
 
     QMidiOut _midiOut;
     Composition* _composition = nullptr;
@@ -60,6 +62,11 @@ private:
     quint64 _amendmentTime = 0;
 
     DeviceInfo _currentDevice;
+
+    QSettings* _settings = nullptr;
+    QString _settingsGroup;
+    const QString _settingKeyLastDeviceId   = "last_device/device_id";
+    const QString _settingKeyLastDeviceName = "last_device/device_name";
 };
 
 

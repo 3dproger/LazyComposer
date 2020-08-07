@@ -4,7 +4,7 @@
 #include <QString>
 
 namespace LazyComposer {
-const QString APP_NAME = "Lazy Composer";
+const QString APP_NAME = "LazyComposer";
 const QString ORGANIZATION_NAME = "Axel_k";
 const QString ORGANIZATION_DOMAIN = "https://github.com/3dproger";
 
