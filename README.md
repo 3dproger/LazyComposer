@@ -8,5 +8,5 @@ Simple midi music generator
 * Just launch the program and enjoy the masterpiece music!
 * Make sure your PC supports midi playback
 * You can also switch tracks and save songs to file
-* Examples of songs can be found in [this folder](examples)
+* [Examples MIDI](examples)
 * <b><a href="/../../releases">Download</a></b>
