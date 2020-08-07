@@ -70,10 +70,10 @@ private:
 
     Composition *currentSelectedComposition(int* position = nullptr);
 
-    QSettings _settings;
+    QSettings* _settings = new QSettings(this);
 
     MidiStorage _midiStorage;
-    MidiPlayer* _midiPlayer = new MidiPlayer(&_settings, "midi_player", this);
+    MidiPlayer* _midiPlayer = new MidiPlayer(_settings, "midi_player", this);
 
     QIcon _iconPlay = QIcon(":/resources/images/play.svg");
 
