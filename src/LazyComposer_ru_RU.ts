@@ -26,8 +26,8 @@
     <message>
         <location filename="mainwindow.ui" line="98"/>
         <location filename="mainwindow.ui" line="112"/>
-        <location filename="mainwindow.cpp" line="107"/>
-        <location filename="mainwindow.cpp" line="108"/>
+        <location filename="mainwindow.cpp" line="109"/>
+        <location filename="mainwindow.cpp" line="110"/>
         <source>0:00</source>
         <translation>0:00</translation>
     </message>
@@ -58,7 +58,7 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="137"/>
-        <location filename="mainwindow.cpp" line="192"/>
+        <location filename="mainwindow.cpp" line="194"/>
         <source>I rest</source>
         <translation>Я отдыхаю</translation>
     </message>
@@ -74,8 +74,9 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="228"/>
-        <source>Midi Device</source>
-        <translation>Midi-устройство</translation>
+        <source>MIDI Device</source>
+        <oldsource>Midi Device</oldsource>
+        <translation>MIDI-устройство</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="237"/>
@@ -94,34 +95,34 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="252"/>
-        <location filename="mainwindow.cpp" line="186"/>
+        <location filename="mainwindow.cpp" line="188"/>
         <source>About</source>
         <translation>О программе</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="92"/>
-        <location filename="mainwindow.cpp" line="292"/>
+        <location filename="mainwindow.cpp" line="94"/>
+        <location filename="mainwindow.cpp" line="297"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="92"/>
+        <location filename="mainwindow.cpp" line="94"/>
         <source>Failed to save file &quot;%1&quot;</source>
         <translation>Не удалось сохранить файл &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="121"/>
-        <location filename="mainwindow.cpp" line="126"/>
+        <location filename="mainwindow.cpp" line="123"/>
+        <location filename="mainwindow.cpp" line="128"/>
         <source>%1:%2</source>
         <translation>%1:%2</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="279"/>
+        <location filename="mainwindow.cpp" line="281"/>
         <source>MIDI devices not found</source>
         <translation>MIDI-устройства не найдены</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="293"/>
+        <location filename="mainwindow.cpp" line="298"/>
         <source>Failed to connect MIDI device &quot;%1&quot;, deviceId: &quot;%2&quot;</source>
         <translation>Не удалось подключиться к MIDI-устройству &quot;%1&quot;, deviceId: &quot;%2&quot;</translation>
     </message>
@@ -130,17 +131,17 @@
         <translation type="vanished">Автор: Александр Кирсанов</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="180"/>
+        <location filename="mainwindow.cpp" line="182"/>
         <source>Version: %1</source>
         <translation>Версия: %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="182"/>
+        <location filename="mainwindow.cpp" line="184"/>
         <source>Alexander Kirsanov (c) %1</source>
         <translation>Александр Кирсанов (c) %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="227"/>
+        <location filename="mainwindow.cpp" line="229"/>
         <source>I&apos;m writing a new track</source>
         <translation>Я пишу новый трек</translation>
     </message>

@@ -225,7 +225,7 @@
    </widget>
    <widget class="QMenu" name="menuMidiDevice">
     <property name="title">
-     <string>Midi Device</string>
+     <string>MIDI Device</string>
     </property>
    </widget>
    <addaction name="menuFile"/>
