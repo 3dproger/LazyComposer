@@ -37,7 +37,7 @@ void MidiPlayer::run()
         _mutex.lock();
         _midiOut.stopAll();
         _currentTime = 0;
-        _unpauseTime = 0;
+        _amendmentTime = 0;
 
         if (_composition && _composition->midi)
         {
@@ -75,7 +75,7 @@ void MidiPlayer::run()
                 {
                     _currentTime = qint64(_composition->midi->timeFromTick(e->tick()) * 1000.0f);
 
-                    qint32 waitTime = _currentTime - _elapsedTime.elapsed() - _unpauseTime;
+                    qint32 waitTime = _currentTime - _elapsedTime.elapsed() - _amendmentTime;
                     if (waitTime > 0)
                     {
                         //ToDo: предусмотреть выход, если задержка слишком большая
@@ -121,7 +121,7 @@ void MidiPlayer::run()
         if (_needExit)
         {
             _currentTime = 0;
-            _unpauseTime = 0;
+            _amendmentTime = 0;
             _mutex.unlock();
             return;
         }
@@ -230,7 +230,7 @@ void MidiPlayer::play(Composition *composition)
 
         _elapsedTime.start();
         _events = _composition->midi->events();
-        _unpauseTime = 0;
+        _amendmentTime = 0;
 
         _currentPosition = 0;
         _maxPosition = _events.count() - 1;
@@ -251,7 +251,7 @@ void MidiPlayer::setPause(bool pause)
     if (_pause)
     {
         _midiOut.stopAll();
-        _unpauseTime += _elapsedTime.elapsed();
+        _amendmentTime += _elapsedTime.elapsed();
     }
     else
     {
@@ -261,7 +261,8 @@ void MidiPlayer::setPause(bool pause)
 
 void MidiPlayer::changePosition(float percentage)
 {
-    _currentPosition = int(float(_maxPosition) * percentage / 100.0f);
+    //QMutexLocker locker(&_mutex);
+    //_currentPosition = int(float(_maxPosition) * percentage / 100.0f);
 }
 
 void MidiPlayer::destroy()
