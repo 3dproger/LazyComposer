@@ -35,8 +35,8 @@ private:
     float _duration1_6 = 40.0f  / _tempo;
     float _duration1_8 = 30.0f  / _tempo;
 
-    const float _tempoBase = 160;
-    const float _tempoDispersion = 40;
+    const float _tempoBase = 155;
+    const float _tempoDispersion = 50;
 
     //{0, 2, 4, 5, 7, 9, 10} major
     //{0, 1, 3, 5, 6, 8, 10} Natural minor
@@ -54,7 +54,8 @@ private:
         {7, 4, 3, 5},
         {7, 4, 5, 3},
         {1, 7, 5, 1},
-        {5, 7, 3, 4}
+        {5, 7, 3, 4},
+        {1, 5, 1, 5}
     };
 
     void makeBass(QMidiFile& midi, const float& time, const int& track, const QList<int>& progression, const int& progressionStep, const QList<float>& rithm, const int& octave);

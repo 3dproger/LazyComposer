@@ -24,8 +24,6 @@ QMidiFile *Composer::compose()
     qsrand(cd.toTime_t());
 
     _tempo = _tempoBase - _tempoDispersion / 2.0f + fmodf(qrand(), _tempoDispersion);
-    qDebug() << "Tempo: " << _tempo;
-    qDebug() << "r: " << fmodf(qrand(), _tempoDispersion);
 
     _duration1_1 = 240.0f / _tempo;
     _duration1_2 = 120.0f / _tempo;
