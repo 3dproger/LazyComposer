@@ -125,7 +125,7 @@ QMidiFile *Composer::compose()
 
                 makeMelody(*midi, time, trackAccomp1, 0);
                 //makeMelody(*midi, time, trackPiano, 1);
-                makeMelody(*midi, time, trackSolo2, 0);
+                makeMelody(*midi, time, trackSolo1, 0);
                 makeMelody(*midi, time, trackAccomp2, 1);
 
                 makeDrums(*midi, time, trackDrumkit);
@@ -148,7 +148,7 @@ QMidiFile *Composer::compose()
 
                 makeMelody(*midi, time, trackAccomp1, 0);
                 //makeMelody(*midi, time, trackFlute, 0);
-                makeMelody(*midi, time, trackSolo1, 0);
+                makeMelody(*midi, time, trackSolo2, 0);
                 makeMelody(*midi, time, trackAccomp2, 1);
 
                 makeDrums(*midi, time, trackDrumkit);
