@@ -70,7 +70,7 @@ private:
 
     Composition *currentSelectedComposition(int* position = nullptr);
 
-    QSettings* _settings = new QSettings(this);
+    QSettings* _settings = new QSettings(this);//ToDo: no use pointer
 
     MidiStorage _midiStorage;
     MidiPlayer _midiPlayer {_settings, "midi_player"};
