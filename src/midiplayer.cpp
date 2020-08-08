@@ -399,6 +399,11 @@ QString MidiPlayer::searchDevice(const QString &deviceId, const QString &deviceN
     return QString();
 }
 
+bool MidiPlayer::isPause() const
+{
+    return _pause;
+}
+
 Composition *MidiPlayer::currentComposition() const
 {
     return _composition;

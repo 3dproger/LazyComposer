@@ -40,6 +40,8 @@ public:
 
     Composition *currentComposition() const;
 
+    bool isPause() const;
+
 signals:
     void stopPlayingSignal();
     void updateProgress(int currentTime, int maxTime);
@@ -48,7 +50,7 @@ signals:
 
 public slots:
     void play(Composition *currentComposition);
-    void setPause(bool pause);
+    void setPause(bool isPause);
     void changePosition(float percentage);
     void destroy();
 

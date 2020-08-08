@@ -193,7 +193,7 @@ void MainWindow::resultComposition(Composition *composition)
     _composer = nullptr;
     ui->labelComposerActivity->setText(tr("I rest"));
     _midiStorage.append(composition);
-    if (!_midiPlayer->isPlaying())
+    if (!_midiPlayer->isPlaying() && !_midiPlayer->isPause())
     {
         playNext();
     }
