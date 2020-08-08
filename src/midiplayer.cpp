@@ -288,15 +288,18 @@ void MidiPlayer::setPause(bool pause)
 {
     QMutexLocker locker(&_mutex);
 
-    _pause = pause;
-    if (_pause)
+    if (_pause != pause)
     {
-        _midiOut.stopAll();
-        _amendmentTime += _elapsedTime.elapsed();
-    }
-    else
-    {
-        _elapsedTime.restart();
+        _pause = pause;
+        if (_pause)
+        {
+            _midiOut.stopAll();
+            _amendmentTime += _elapsedTime.elapsed();
+        }
+        else
+        {
+            _elapsedTime.restart();
+        }
     }
 }
 
