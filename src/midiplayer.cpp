@@ -54,11 +54,12 @@ MidiPlayer::MidiPlayer(QSettings* settings, const QString& _settingsGroup, QObje
     connect(_timerUpdateDevices, &QTimer::timeout, this, &MidiPlayer::onUpdateDevices);
     _timerUpdateDevices->setInterval(1000);
     _timerUpdateDevices->start();
-    _timerUpdateDevices->deleteLater();
 }
 
 MidiPlayer::~MidiPlayer()
 {
+    _timerUpdateDevices->deleteLater();
+    QThread::msleep(50);
     _needExit = true;
     _mutex.lock();
     _timerUpdateDevices->stop();

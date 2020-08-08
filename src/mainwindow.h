@@ -32,7 +32,7 @@ private slots:
 
     void compositionAppended(Composition*);
 
-    void playingStopSlot();
+    void onStopped();
 
     void updatePlayerProgress(int currentTime, int maxTime);
 
