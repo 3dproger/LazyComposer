@@ -66,7 +66,7 @@ QMidiFile *Composer::compose()
     midi->createTempoEvent(0, 0, _tempo);
 
 
-    //QList<int> rithm = {8, 16, 16, 8, 16, 16, 8, 16, 16, 8, 16, 16}; //Horse 1
+    //QList<float> rithm = {8, 16, 16, 8, 16, 16, 8, 16, 16, 8, 16, 16}; //Horse 1
     //QList<float> rithm = {6, 6, 6, 6, 8, 8}; //Club 1
     //QList<float> rithm = {1};                    //Basic 1
     //QList<float> rithm = {2, 2};                 //Basic 2
