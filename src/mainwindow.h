@@ -21,13 +21,9 @@ public:
     ~MainWindow();
 
 signals:
-    void playSignal(Composition*);
     void changePositionPlayer(float percentage);
-    void setPausePlayer(bool pause);
 
 private slots:
-    void on_actionOpenMIDI_triggered();
-
     void on_btnPlay_clicked();
 
     void on_actionOpen_triggered();
@@ -36,7 +32,7 @@ private slots:
 
     void compositionAppended(Composition*);
 
-    void playingStopSlot();
+    void onStopped();
 
     void updatePlayerProgress(int currentTime, int maxTime);
 
@@ -62,6 +58,8 @@ private slots:
 
     void onSelectDeviceTriggered();
 
+    void onMidiPlayerError(MidiPlayer::Error error);
+
 protected:
     void closeEvent(QCloseEvent *event);
 
@@ -70,7 +68,7 @@ private:
 
     Composition *currentSelectedComposition(int* position = nullptr);
 
-    QSettings* _settings = new QSettings(this);
+    QSettings* _settings = new QSettings(this);//ToDo: no use pointer
 
     MidiStorage _midiStorage;
     MidiPlayer* _midiPlayer = new MidiPlayer(_settings, "midi_player", this);

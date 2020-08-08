@@ -5,6 +5,11 @@
 MidiPlayer::MidiPlayer(QSettings* settings, const QString& _settingsGroup, QObject *parent)
     : QObject(parent), _settings(settings), _settingsGroup(_settingsGroup)
 {
+    setAutoDelete(true);
+
+    connect(&_midiOut, &QMidiOut::disconnected, this, &MidiPlayer::onDeviceDisconnected);
+
+    //Trying to connect to last opened device
     const QList<DeviceInfo>& devices = MidiPlayer::devices();
 
     if (_settings)
@@ -44,18 +49,26 @@ MidiPlayer::MidiPlayer(QSettings* settings, const QString& _settingsGroup, QObje
         }
     }
 
-    connect(&_timerDevicesUpdate, &QTimer::timeout, this, &MidiPlayer::onUpdateDevices);
-    _timerDevicesUpdate.setInterval(2000);
-    _timerDevicesUpdate.start();
+    //Timer
+
+    connect(_timerUpdateDevices, &QTimer::timeout, this, &MidiPlayer::onUpdateDevices);
+    _timerUpdateDevices->setInterval(1000);
+    _timerUpdateDevices->start();
 }
 
 MidiPlayer::~MidiPlayer()
 {
-    QMutexLocker locker(&_mutex);
+    _timerUpdateDevices->deleteLater();
+    QThread::msleep(50);
+    _needExit = true;
+    _mutex.lock();
+    _timerUpdateDevices->stop();
+    _enableSignalonDeviceDisconnected = false;
     _midiOut.stopAll();
     _midiOut.disconnect();
 
     emit devicesChanged();
+    _mutex.unlock();
 }
 
 bool MidiPlayer::isPlaying()
@@ -86,7 +99,7 @@ void MidiPlayer::run()
 
                 if (_needExit){
                     _mutex.unlock();
-                    return;
+                    break;;
                 }
 
                 if (!_composition || !_composition->midi || _needStop)
@@ -140,7 +153,7 @@ void MidiPlayer::run()
                 _needStop = false;
             }
             else{
-                emit stopPlayingSignal();
+                emit stopped();
                 _composition = nullptr;
             }
 
@@ -155,7 +168,7 @@ void MidiPlayer::run()
             _currentTime = 0;
             _amendmentTime = 0;
             _mutex.unlock();
-            return;
+            break;
         }
         _mutex.unlock();
     }
@@ -190,17 +203,19 @@ MidiPlayer::DeviceInfo MidiPlayer::currentDevice() const
     return _currentDevice;
 }
 
-bool MidiPlayer::setDevice(const QString &deviceId)
+MidiPlayer::Error MidiPlayer::setDevice(const QString &deviceId)
 {
     QMutexLocker locker(&_mutex);
+
+    Error e;
+
+    _currentDevice = DeviceInfo();
 
     if (_midiOut.isConnected())
     {
         _midiOut.stopAll();
         _midiOut.disconnect();
     }
-
-    _currentDevice = DeviceInfo();
 
     bool found = false;
     bool connected = false;
@@ -210,7 +225,6 @@ bool MidiPlayer::setDevice(const QString &deviceId)
         if (deviceId == device.id)
         {
             found = true;
-            _midiOut = QMidiOut();
             connected = _midiOut.connect(deviceId);
             _currentDevice = device;
             _currentDevice.isConnected = connected;
@@ -220,7 +234,10 @@ bool MidiPlayer::setDevice(const QString &deviceId)
 
     if (!found)
     {
-        qCritical(QString("%1: Device %2 not found!").arg(Q_FUNC_INFO).arg(deviceId).toUtf8());
+        qWarning(QString("%1: Device %2 not found!").arg(Q_FUNC_INFO).arg(deviceId).toUtf8());
+
+        e = Error(ErrorType::DeviceByIdNotFound,
+                  tr("Device with id \"%1\" not found").arg(deviceId));
     }
 
     if (connected)
@@ -242,23 +259,40 @@ bool MidiPlayer::setDevice(const QString &deviceId)
             _settings->setValue(_settingsGroup + "/" + _settingKeyLastDeviceName, "");
         }
 
-        qCritical(QString("%1: Failed to connect device %2: \"%3\"")
+        qWarning(QString("%1: Failed to connect device %2: \"%3\"")
                .arg(Q_FUNC_INFO).arg(_currentDevice.name).arg(_currentDevice.id).toUtf8());
+
+        e = Error(ErrorType::FailedToConnectDevice,
+                  tr("Failed to connect device %1: \"%2\"").arg(_currentDevice.name).arg(_currentDevice.id));
     }
 
     emit devicesChanged();
 
-    return connected;
+    return e;
 }
 
-void MidiPlayer::play(Composition *composition)
+MidiPlayer::Error MidiPlayer::play(Composition *composition)
 {
     QMutexLocker locker(&_mutex);
 
+    if (!composition)
+    {
+        qDebug("!composition->midi");
+        return Error(NoComposition,
+                     tr("No composition specified"));
+    }
+
     if (!composition || !composition->midi)
     {
-        qDebug("MidiPlayer::play(): !composition || !composition->midi");
-        return;
+        qDebug("!composition->midi");
+        return Error(InvalidComposition,
+                     tr("Invalid composition"));
+    }
+
+    if (!_midiOut.isConnected())
+    {
+        return Error(DeviceNotConnected,
+                     tr("MIDI device not connected"));
     }
 
     _midiOut.stopAll();
@@ -282,22 +316,38 @@ void MidiPlayer::play(Composition *composition)
     }
 
     _pause = false;
+
+    return Error();
 }
 
-void MidiPlayer::setPause(bool pause)
+MidiPlayer::Error MidiPlayer::setPause(bool pause)
 {
     QMutexLocker locker(&_mutex);
 
-    _pause = pause;
-    if (_pause)
+    if (_pause != pause)
     {
-        _midiOut.stopAll();
-        _amendmentTime += _elapsedTime.elapsed();
+        _pause = pause;
+        if (_pause)
+        {
+            _midiOut.stopAll();
+            _amendmentTime += _elapsedTime.elapsed();
+        }
+        else
+        {
+            if (_midiOut.isConnected())
+            {
+                _elapsedTime.restart();
+            }
+            else
+            {
+                _pause = true;
+                return Error(DeviceNotConnected,
+                             tr("MIDI device not connected"));
+            }
+        }
     }
-    else
-    {
-        _elapsedTime.restart();
-    }
+
+    return Error();
 }
 
 void MidiPlayer::changePosition(float percentage)
@@ -320,6 +370,23 @@ void MidiPlayer::onUpdateDevices()
     {
         _devices = devices;
         emit devicesChanged();
+    }
+}
+
+void MidiPlayer::onDeviceDisconnected(QString deviceId)
+{
+    //TODO: Maybe need mutex
+
+    if (_currentDevice.id == deviceId)
+    {
+        //setPause(true);
+        _currentDevice.isConnected = false;
+
+        if (_enableSignalonDeviceDisconnected)
+        {
+            emit error(Error(ErrorType::CurrentDeviceDisconnected,
+                             tr("The current MIDI-device is disconnected. Playback stopped. Select another MIDI-device to continue playback")));
+        }
     }
 }
 
@@ -395,3 +462,14 @@ QString MidiPlayer::searchDevice(const QString &deviceId, const QString &deviceN
     //Not found
     return QString();
 }
+
+bool MidiPlayer::isPause() const
+{
+    return _pause;
+}
+
+Composition *MidiPlayer::currentComposition() const
+{
+    return _composition;
+}
+
