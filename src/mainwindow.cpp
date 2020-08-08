@@ -27,39 +27,39 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(&_midiStorage, SIGNAL(appended(Composition*)), this, SLOT(compositionAppended(Composition*)));
 
-    connect(&_midiPlayer, &MidiPlayer::updateProgress,    this, &MainWindow::updatePlayerProgress);
-    connect(&_midiPlayer, &MidiPlayer::stopPlayingSignal, this, &MainWindow::playingStopSlot);
-    connect(&_midiPlayer, &MidiPlayer::playStarted,       this, &MainWindow::playStarted);
-    connect(&_midiPlayer, &MidiPlayer::error,             this, &MainWindow::onMidiPlayerError);
-    connect(&_midiPlayer, &MidiPlayer::devicesChanged,    this, &MainWindow::onDevicesChanged);
+    connect(_midiPlayer, &MidiPlayer::updateProgress,    this, &MainWindow::updatePlayerProgress);
+    connect(_midiPlayer, &MidiPlayer::stopPlayingSignal, this, &MainWindow::playingStopSlot);
+    connect(_midiPlayer, &MidiPlayer::playStarted,       this, &MainWindow::playStarted);
+    connect(_midiPlayer, &MidiPlayer::error,             this, &MainWindow::onMidiPlayerError);
+    connect(_midiPlayer, &MidiPlayer::devicesChanged,    this, &MainWindow::onDevicesChanged);
     onDevicesChanged();
 
     ui->progressBarComposition->setValue(0);
 
-    QThreadPool::globalInstance()->start(&_midiPlayer);
+    QThreadPool::globalInstance()->start(_midiPlayer);
 
     playNext();
 }
 
 MainWindow::~MainWindow()
 {
+    if (!QThreadPool::globalInstance()->waitForDone(2000))
+    {
+        qDebug("%s: Failed to wait stop QThreadPool", Q_FUNC_INFO);
+    }
     delete ui;
-}
-
-void MainWindow::on_actionOpenMIDI_triggered(){
-
 }
 
 void MainWindow::on_btnPlay_clicked(){
     int index;
     Composition* composition = currentSelectedComposition(&index);
-    if (composition && composition != _midiPlayer.currentComposition())
+    if (composition && composition != _midiPlayer->currentComposition())
     {
         _currentTrack = _midiStorage.compositions().indexOf(composition);
         playNext();
     }
 
-    _midiPlayer.setPause(false);
+    _midiPlayer->setPause(false);
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -128,7 +128,7 @@ void MainWindow::updatePlayerProgress(int currentTime, int maxTime)
 
 void MainWindow::on_btnPause_clicked()
 {
-    MidiPlayer::Error error = _midiPlayer.setPause(true);
+    MidiPlayer::Error error = _midiPlayer->setPause(true);
     if (error.type() != MidiPlayer::ErrorType::NoError)
     {
         QMessageBox::warning(this, tr("MIDI Player Error"), error.text());
@@ -167,7 +167,7 @@ Composition *MainWindow::currentSelectedComposition(int* position)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    _midiPlayer.destroy();
+    _midiPlayer->destroy();
     _midiStorage.clear();
 
     QThread::msleep(100);
@@ -195,7 +195,7 @@ void MainWindow::resultComposition(Composition *composition)
     _composer = nullptr;
     ui->labelComposerActivity->setText(tr("I rest"));
     _midiStorage.append(composition);
-    if (!_midiPlayer.isPlaying() && !_midiPlayer.isPause())
+    if (!_midiPlayer->isPlaying() && !_midiPlayer->isPause())
     {
         playNext();
     }
@@ -212,7 +212,7 @@ void MainWindow::playNext()
 
     if (_currentTrack < _midiStorage.compositions().count())
     {
-        MidiPlayer::Error error = _midiPlayer.play(_midiStorage.compositions().at(_currentTrack));
+        MidiPlayer::Error error = _midiPlayer->play(_midiStorage.compositions().at(_currentTrack));
         if (error.type() != MidiPlayer::ErrorType::NoError)
         {
             QMessageBox::warning(this, tr("MIDI Player Error"), error.text());
@@ -268,9 +268,9 @@ void MainWindow::onDevicesChanged()
 {
     ui->menuMidiDevice->clear();
 
-    if (!_midiPlayer.devices().isEmpty())
+    if (!_midiPlayer->devices().isEmpty())
     {
-        for (const auto& device : _midiPlayer.devices())
+        for (const auto& device : _midiPlayer->devices())
         {
             QString text = device.id;
             if (!device.name.isEmpty())
@@ -304,7 +304,7 @@ void MainWindow::onSelectDeviceTriggered()
     {
         QString           deviceName = action->text();
         QString           deviceId   = action->data().toString();
-        MidiPlayer::Error error      = _midiPlayer.setDevice(action->data().toString());
+        MidiPlayer::Error error      = _midiPlayer->setDevice(action->data().toString());
 
         if (error.type() != MidiPlayer::ErrorType::NoError)
         {

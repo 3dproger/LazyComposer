@@ -5,6 +5,8 @@
 MidiPlayer::MidiPlayer(QSettings* settings, const QString& _settingsGroup, QObject *parent)
     : QObject(parent), _settings(settings), _settingsGroup(_settingsGroup)
 {
+    setAutoDelete(true);
+
     connect(&_midiOut, &QMidiOut::disconnected, this, &MidiPlayer::onDeviceDisconnected);
 
     //Trying to connect to last opened device
@@ -47,20 +49,24 @@ MidiPlayer::MidiPlayer(QSettings* settings, const QString& _settingsGroup, QObje
         }
     }
 
-    //Setting of update device timer
-    connect(&_timerDevicesUpdate, &QTimer::timeout, this, &MidiPlayer::onUpdateDevices);
-    _timerDevicesUpdate.setInterval(1000);
-    _timerDevicesUpdate.start();
+    //Timer
+    QTimer* timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &MidiPlayer::onUpdateDevices);
+    timer->setInterval(1000);
+    timer->start();
+    timer->deleteLater();
 }
 
 MidiPlayer::~MidiPlayer()
 {
-    QMutexLocker locker(&_mutex);
+    _needExit = true;
+    _mutex.lock();
     _enableSignalonDeviceDisconnected = false;
     _midiOut.stopAll();
     _midiOut.disconnect();
 
-    //emit devicesChanged();
+    emit devicesChanged();
+    _mutex.unlock();
 }
 
 bool MidiPlayer::isPlaying()
@@ -91,7 +97,7 @@ void MidiPlayer::run()
 
                 if (_needExit){
                     _mutex.unlock();
-                    return;
+                    break;;
                 }
 
                 if (!_composition || !_composition->midi || _needStop)
@@ -160,7 +166,7 @@ void MidiPlayer::run()
             _currentTime = 0;
             _amendmentTime = 0;
             _mutex.unlock();
-            return;
+            break;
         }
         _mutex.unlock();
     }

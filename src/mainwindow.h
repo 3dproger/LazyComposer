@@ -24,8 +24,6 @@ signals:
     void changePositionPlayer(float percentage);
 
 private slots:
-    void on_actionOpenMIDI_triggered();
-
     void on_btnPlay_clicked();
 
     void on_actionOpen_triggered();
@@ -73,7 +71,7 @@ private:
     QSettings* _settings = new QSettings(this);//ToDo: no use pointer
 
     MidiStorage _midiStorage;
-    MidiPlayer _midiPlayer {_settings, "midi_player"};
+    MidiPlayer* _midiPlayer = new MidiPlayer(_settings, "midi_player", this);
 
     QIcon _iconPlay = QIcon(":/resources/images/play.svg");
 
