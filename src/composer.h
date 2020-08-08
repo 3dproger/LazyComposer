@@ -35,12 +35,15 @@ private:
     float _duration1_6 = 40.0f  / _tempo;
     float _duration1_8 = 30.0f  / _tempo;
 
+    const float _tempoBase = 160;
+    const float _tempoDispersion = 40;
+
     //{0, 2, 4, 5, 7, 9, 10} major
     //{0, 1, 3, 5, 6, 8, 10} Natural minor
     //{0, 1, 3, 5, 6, 9, 10} Harmonic minor
-    QList<int> _harmony = {0, 2, 3, 5, 7, 9, 10};
+    const QList<int> _harmony = {0, 2, 3, 5, 7, 9, 10};
 
-    QList<QList<int>> _progressions =
+    const QList<QList<int>> _progressions =
     {
         {5, 3, 7, 4},
         {5, 5, 3, 2},

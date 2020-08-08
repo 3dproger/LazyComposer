@@ -1,5 +1,7 @@
 #include "composer.h"
 #include <QDateTime>
+#include <QDebug>
+#include <cmath>
 
 Composer::Composer(QObject *parent) : QObject(parent)
 {
@@ -21,7 +23,9 @@ QMidiFile *Composer::compose()
     QDateTime cd = QDateTime::currentDateTime();
     qsrand(cd.toTime_t());
 
-    _tempo = 160 + qrand() % 15;// 120 + qrand() % 50;
+    _tempo = _tempoBase - _tempoDispersion / 2.0f + fmodf(qrand(), _tempoDispersion);
+    qDebug() << "Tempo: " << _tempo;
+    qDebug() << "r: " << fmodf(qrand(), _tempoDispersion);
 
     _duration1_1 = 240.0f / _tempo;
     _duration1_2 = 120.0f / _tempo;
