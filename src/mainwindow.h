@@ -21,9 +21,7 @@ public:
     ~MainWindow();
 
 signals:
-    void playSignal(Composition*);
     void changePositionPlayer(float percentage);
-    void setPausePlayer(bool pause);
 
 private slots:
     void on_actionOpenMIDI_triggered();
@@ -61,6 +59,8 @@ private slots:
     void onDevicesChanged();
 
     void onSelectDeviceTriggered();
+
+    void onMidiPlayerError(MidiPlayer::Error error);
 
 protected:
     void closeEvent(QCloseEvent *event);

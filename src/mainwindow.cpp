@@ -27,12 +27,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(&_midiStorage, SIGNAL(appended(Composition*)), this, SLOT(compositionAppended(Composition*)));
 
-    connect(this, SIGNAL(playSignal(Composition*)), _midiPlayer, SLOT(play(Composition*)));
-    connect(this, SIGNAL(changePositionPlayer(float)), _midiPlayer, SLOT(changePosition(float)));
     connect(this, SIGNAL(setPausePlayer(bool)), _midiPlayer, SLOT(setPause(bool)));
     connect(_midiPlayer, SIGNAL(updateProgress(int, int)), this, SLOT(updatePlayerProgress(int, int)));
     connect(_midiPlayer, SIGNAL(stopPlayingSignal()), this, SLOT(playingStopSlot()));
     connect(_midiPlayer, SIGNAL(playStarted(Composition*)), this, SLOT(playStarted(Composition*)));
+    connect(_midiPlayer, &MidiPlayer::error, this, &MainWindow::onMidiPlayerError);
     connect(_midiPlayer, &MidiPlayer::devicesChanged, this, &MainWindow::onDevicesChanged);
     onDevicesChanged();
 
@@ -130,7 +129,11 @@ void MainWindow::updatePlayerProgress(int currentTime, int maxTime)
 
 void MainWindow::on_btnPause_clicked()
 {
-    emit setPausePlayer(true);
+    MidiPlayer::Error error = _midiPlayer->setPause(true);
+    if (error.type() != MidiPlayer::ErrorType::NoError)
+    {
+        QMessageBox::warning(this, tr("MIDI Player Error"), error.text());
+    }
 }
 
 void MainWindow::on_hsPlayerCurrentPos_sliderMoved(int position)
@@ -210,7 +213,12 @@ void MainWindow::playNext()
 
     if (_currentTrack < _midiStorage.compositions().count())
     {
-        emit playSignal(_midiStorage.compositions().at(_currentTrack));
+        MidiPlayer::Error error = _midiPlayer->play(_midiStorage.compositions().at(_currentTrack));
+        if (error.type() != MidiPlayer::ErrorType::NoError)
+        {
+            QMessageBox::warning(this, tr("MIDI Player Error"), error.text());
+        }
+
         _currentTrack++;
     }
 
@@ -295,15 +303,13 @@ void MainWindow::onSelectDeviceTriggered()
     QAction* action = qobject_cast<QAction*>(sender());
     if (action)
     {
-        QString deviceName = action->text();
-        QString deviceId   = action->data().toString();
+        QString           deviceName = action->text();
+        QString           deviceId   = action->data().toString();
+        MidiPlayer::Error error      = _midiPlayer->setDevice(action->data().toString());
 
-        if (!_midiPlayer->setDevice(action->data().toString()))
+        if (error.type() != MidiPlayer::ErrorType::NoError)
         {
-            QMessageBox::critical(this, tr("Error"),
-                                  tr("Failed to connect MIDI device \"%1\", deviceId: \"%2\"")
-                                  .arg(deviceName)
-                                  .arg(deviceId));
+            QMessageBox::critical(this, tr("Error"), error.text());
         }
     }
     else
@@ -312,7 +318,7 @@ void MainWindow::onSelectDeviceTriggered()
     }
 }
 
-
-
-
-
+void MainWindow::onMidiPlayerError(MidiPlayer::Error error)
+{
+    QMessageBox::warning(this, tr("MIDI Player Error"), error.text());
+}

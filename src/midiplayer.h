@@ -15,6 +15,33 @@ class MidiPlayer : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
+    enum ErrorType {
+        NoError,
+        CommonError,
+        CurrentDeviceDisconnected,
+        FailedToConnectDevice,
+        DeviceByIdNotFound,
+        DevicesNotFound,
+        DeviceNotConnected,
+        NoComposition,
+        InvalidComposition
+    };
+
+    class Error{
+    public:
+        friend class MidiPlayer;
+
+        Error(ErrorType type, QString text) :
+            _type(type), _text(text) { }
+        ErrorType type() const { return _type; }
+        QString   text() const { return _text; }
+
+    private:
+        Error(){}
+        ErrorType _type = ErrorType::NoError;
+        QString _text = tr("No Error");
+    };
+
     struct DeviceInfo {
         QString id;
         QString name;
@@ -36,21 +63,22 @@ public:
     void run();
     QList<DeviceInfo> devices() const;
     DeviceInfo currentDevice() const;
-    bool setDevice(const QString& deviceId);
+    Error setDevice(const QString& deviceId);
 
     Composition *currentComposition() const;
 
     bool isPause() const;
+    Error play(Composition *currentComposition);
+    Error setPause(bool isPause);
 
 signals:
     void stopPlayingSignal();
     void updateProgress(int currentTime, int maxTime);
     void playStarted(Composition*);
     void devicesChanged();
+    void error(Error error);
 
 public slots:
-    void play(Composition *currentComposition);
-    void setPause(bool isPause);
     void changePosition(float percentage);
     void destroy();
 
@@ -81,6 +109,8 @@ private:
     QTimer _timerDevicesUpdate;
     QList<DeviceInfo> _devices;
     DeviceInfo _currentDevice;
+
+    bool _enableSignalonDeviceDisconnected = true;
 
     QSettings* _settings = nullptr;
     QString _settingsGroup;
