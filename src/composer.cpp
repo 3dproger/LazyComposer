@@ -33,7 +33,25 @@ QMidiFile *Composer::compose()
 
 
     _transposition = qrand() % 12;
-    QList<int> progression = _progressions.at(qrand() % _progressions.size());
+
+    QList<int> progressionDrop1   = _progressions.at(qrand() % _progressions.size());
+    QList<int> progressionDrop2   = _progressions.at(qrand() % _progressions.size());
+    if (qrand() % 100 <= 60)
+    {
+        progressionDrop2 = progressionDrop1;
+    }
+
+    QList<int> progressionHollow1 = _progressions.at(qrand() % _progressions.size());
+    QList<int> progressionHollow2 = _progressions.at(qrand() % _progressions.size());
+    if (qrand() % 100 <= 30)
+    {
+        progressionHollow1 = progressionDrop1;
+    }
+    if (qrand() % 100 <= 60)
+    {
+        progressionHollow2 = progressionHollow1;
+    }
+
     QList<QList<int>> accomponiment = {{0}, {4}, {7}, {4}, {9}, {4}, {7}, {4}};
     QList<QList<int>> accomponimentDrive1 = {{0, 4, 7}};
     QList<QList<int>> accomponimentDrive2 = {{0}, {0}, {0, 4, 7}, {0}, {0}, {0, 4, 7}, {0}, {0, 4, 7}};
@@ -77,23 +95,24 @@ QMidiFile *Composer::compose()
 
     int repeats = 2; // повторы
     int progressionSteps = 4; //размер прогрессии
-    int dropSize = 4; //размер дропа
+    int dropSize1 = 2;
+    int dropSize2 = 2;
     int hollowSize1 = 2;
     int hollowSize2 = 2;
 
-    int tackts = ((dropSize + hollowSize1 + hollowSize2) * progressionSteps) * repeats;
+    int tackts = ((dropSize1 + dropSize2 + hollowSize1 + hollowSize2) * progressionSteps) * repeats;
     int tacktCouter = 0;
 
     for (int repeat = 0; repeat < repeats; ++repeat){
-        for (int i = 0; i < dropSize; ++i)
+        for (int i = 0; i < dropSize1; ++i)
         {
             for (int progressionStep = 0; progressionStep < progressionSteps; ++progressionStep){
 
 
-                makeBass(*midi, time, trackBass, progression, progressionStep, rithm, -3);
+                makeBass(*midi, time, trackBass, progressionDrop1, progressionStep, rithm, -3);
 
-                makeAccomp(*midi, time, trackGuitar, progression, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponiment);
-                makeAccomp(*midi, time, trackGuitarDrive, progression, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponimentDrive1);
+                makeAccomp(*midi, time, trackGuitar, progressionDrop1, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponiment);
+                makeAccomp(*midi, time, trackGuitarDrive, progressionDrop1, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponimentDrive1);
 
                 makeMelody(*midi, time, trackPiano, 0);
                 makeMelody(*midi, time, trackPiano, 1);
@@ -105,7 +124,28 @@ QMidiFile *Composer::compose()
                 tacktCouter++;
                 emit updateProgress(tacktCouter * 100 / tackts);
             }
+        }
 
+        for (int i = 0; i < dropSize2; ++i)
+        {
+            for (int progressionStep = 0; progressionStep < progressionSteps; ++progressionStep){
+
+
+                makeBass(*midi, time, trackBass, progressionDrop2, progressionStep, rithm, -3);
+
+                makeAccomp(*midi, time, trackGuitar, progressionDrop2, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponiment);
+                makeAccomp(*midi, time, trackGuitarDrive, progressionDrop2, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponimentDrive1);
+
+                makeMelody(*midi, time, trackPiano, 0);
+                makeMelody(*midi, time, trackPiano, 1);
+                makeMelody(*midi, time, trackGuitar, 1);
+
+                makeDrums(*midi, time, trackDrumkit);
+
+                time += _duration1_1;
+                tacktCouter++;
+                emit updateProgress(tacktCouter * 100 / tackts);
+            }
         }
 
         for (int i = 0; i < hollowSize1; ++i)
@@ -113,9 +153,9 @@ QMidiFile *Composer::compose()
             for (int progressionStep = 0; progressionStep < progressionSteps; ++progressionStep){
 
 
-                makeBass(*midi, time, trackBass, progression, progressionStep, rithm, -3);
+                makeBass(*midi, time, trackBass, progressionHollow1, progressionStep, rithm, -3);
 
-                makeAccomp(*midi, time, trackGuitar, progression, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponiment);
+                makeAccomp(*midi, time, trackGuitar, progressionHollow1, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponiment);
 
                 makeMelody(*midi, time, trackPiano, 0);
 
@@ -132,10 +172,10 @@ QMidiFile *Composer::compose()
             for (int progressionStep = 0; progressionStep < progressionSteps; ++progressionStep){
 
 
-                makeBass(*midi, time, trackBass, progression, progressionStep, rithm, -3);
+                makeBass(*midi, time, trackBass, progressionHollow2, progressionStep, rithm, -3);
 
-                makeAccomp(*midi, time, trackGuitar, progression, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponiment);
-                makeAccomp(*midi, time, trackGuitarDrive, progression, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponimentDrive2);
+                makeAccomp(*midi, time, trackGuitar, progressionHollow2, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponiment);
+                makeAccomp(*midi, time, trackGuitarDrive, progressionHollow2, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponimentDrive2);
 
                 makeMelody(*midi, time, trackPiano, 0);
                 makeMelody(*midi, time, trackGuitar, 1);
