@@ -9,9 +9,8 @@
         <translation>Ленивый Композитор</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="21"/>
         <source>Radio</source>
-        <translation>Радио</translation>
+        <translation type="vanished">Радио</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="49"/>
@@ -63,6 +62,11 @@
         <translation>Я отдыхаю</translation>
     </message>
     <message>
+        <location filename="mainwindow.ui" line="21"/>
+        <source>MIDI Player</source>
+        <translation>MIDI-проигрыватель</translation>
+    </message>
+    <message>
         <location filename="mainwindow.ui" line="215"/>
         <source>File</source>
         <translation>Файл</translation>
@@ -101,7 +105,7 @@
     </message>
     <message>
         <location filename="mainwindow.cpp" line="94"/>
-        <location filename="mainwindow.cpp" line="297"/>
+        <location filename="mainwindow.cpp" line="303"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -117,12 +121,12 @@
         <translation>%1:%2</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="281"/>
+        <location filename="mainwindow.cpp" line="287"/>
         <source>MIDI devices not found</source>
         <translation>MIDI-устройства не найдены</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="298"/>
+        <location filename="mainwindow.cpp" line="304"/>
         <source>Failed to connect MIDI device &quot;%1&quot;, deviceId: &quot;%2&quot;</source>
         <translation>Не удалось подключиться к MIDI-устройству &quot;%1&quot;, deviceId: &quot;%2&quot;</translation>
     </message>
