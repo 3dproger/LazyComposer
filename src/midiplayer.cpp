@@ -152,7 +152,7 @@ void MidiPlayer::run()
                 _needStop = false;
             }
             else{
-                emit stopPlayingSignal();
+                emit stopped();
                 _composition = nullptr;
             }
 

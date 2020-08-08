@@ -72,7 +72,7 @@ public:
     Error setPause(bool isPause);
 
 signals:
-    void stopPlayingSignal();
+    void stopped();
     void updateProgress(int currentTime, int maxTime);
     void playStarted(Composition*);
     void devicesChanged();

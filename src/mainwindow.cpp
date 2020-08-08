@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&_midiStorage, SIGNAL(appended(Composition*)), this, SLOT(compositionAppended(Composition*)));
 
     connect(_midiPlayer, &MidiPlayer::updateProgress,    this, &MainWindow::updatePlayerProgress);
-    connect(_midiPlayer, &MidiPlayer::stopPlayingSignal, this, &MainWindow::playingStopSlot);
+    connect(_midiPlayer, &MidiPlayer::stopped,           this, &MainWindow::onStopped);
     connect(_midiPlayer, &MidiPlayer::playStarted,       this, &MainWindow::playStarted);
     connect(_midiPlayer, &MidiPlayer::error,             this, &MainWindow::onMidiPlayerError);
     connect(_midiPlayer, &MidiPlayer::devicesChanged,    this, &MainWindow::onDevicesChanged);
@@ -100,7 +100,7 @@ void MainWindow::compositionAppended(Composition* compisition)
     ui->listWidgetCompositions->addItem(compisition->title);
 }
 
-void MainWindow::playingStopSlot()
+void MainWindow::onStopped()
 {
     ui->labelCurrentPlaying->setText("---");
     ui->hsPlayerCurrentPos->setValue(0);
