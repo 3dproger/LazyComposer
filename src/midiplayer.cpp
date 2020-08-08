@@ -5,6 +5,9 @@
 MidiPlayer::MidiPlayer(QSettings* settings, const QString& _settingsGroup, QObject *parent)
     : QObject(parent), _settings(settings), _settingsGroup(_settingsGroup)
 {
+    //connect(&_midiOut, &QMidiOut::disconnected, this, &MidiPlayer::onDeviceDisconnected);
+
+    //Trying to connect to last opened device
     const QList<DeviceInfo>& devices = MidiPlayer::devices();
 
     if (_settings)
@@ -44,6 +47,7 @@ MidiPlayer::MidiPlayer(QSettings* settings, const QString& _settingsGroup, QObje
         }
     }
 
+    //Setting of update device timer
     connect(&_timerDevicesUpdate, &QTimer::timeout, this, &MidiPlayer::onUpdateDevices);
     _timerDevicesUpdate.setInterval(1000);
     _timerDevicesUpdate.start();
@@ -194,13 +198,13 @@ bool MidiPlayer::setDevice(const QString &deviceId)
 {
     QMutexLocker locker(&_mutex);
 
+    _currentDevice = DeviceInfo();
+
     if (_midiOut.isConnected())
     {
         _midiOut.stopAll();
         _midiOut.disconnect();
     }
-
-    _currentDevice = DeviceInfo();
 
     bool found = false;
     bool connected = false;
@@ -210,7 +214,6 @@ bool MidiPlayer::setDevice(const QString &deviceId)
         if (deviceId == device.id)
         {
             found = true;
-            _midiOut = QMidiOut();
             connected = _midiOut.connect(deviceId);
             _currentDevice = device;
             _currentDevice.isConnected = connected;
@@ -324,6 +327,12 @@ void MidiPlayer::onUpdateDevices()
         _devices = devices;
         emit devicesChanged();
     }
+}
+
+void MidiPlayer::onDeviceDisconnected(QString deviceId)
+{
+    qCritical(QString("%1: Device disconnected %2")
+           .arg(Q_FUNC_INFO).arg(deviceId).toUtf8());
 }
 
 quint64 MidiPlayer::calcTime(QMidiFile *midiFile)

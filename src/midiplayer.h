@@ -56,6 +56,7 @@ public slots:
 
 private slots:
     void onUpdateDevices();
+    void onDeviceDisconnected(QString deviceId);
 
 private:
     static quint64 calcTime(QMidiFile* _midiFile);
