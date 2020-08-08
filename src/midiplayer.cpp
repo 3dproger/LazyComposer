@@ -45,7 +45,7 @@ MidiPlayer::MidiPlayer(QSettings* settings, const QString& _settingsGroup, QObje
     }
 
     connect(&_timerDevicesUpdate, &QTimer::timeout, this, &MidiPlayer::onUpdateDevices);
-    _timerDevicesUpdate.setInterval(2000);
+    _timerDevicesUpdate.setInterval(1000);
     _timerDevicesUpdate.start();
 }
 
