@@ -398,3 +398,8 @@ QString MidiPlayer::searchDevice(const QString &deviceId, const QString &deviceN
     //Not found
     return QString();
 }
+
+Composition *MidiPlayer::currentComposition() const
+{
+    return _composition;
+}

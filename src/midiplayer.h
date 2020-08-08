@@ -38,6 +38,8 @@ public:
     DeviceInfo currentDevice() const;
     bool setDevice(const QString& deviceId);
 
+    Composition *currentComposition() const;
+
 signals:
     void stopPlayingSignal();
     void updateProgress(int currentTime, int maxTime);
@@ -45,7 +47,7 @@ signals:
     void devicesChanged();
 
 public slots:
-    void play(Composition *composition);
+    void play(Composition *currentComposition);
     void setPause(bool pause);
     void changePosition(float percentage);
     void destroy();

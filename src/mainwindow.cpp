@@ -55,7 +55,7 @@ void MainWindow::on_actionOpenMIDI_triggered(){
 void MainWindow::on_btnPlay_clicked(){
     int index;
     Composition* composition = currentSelectedComposition(&index);
-    if (composition)
+    if (composition && composition != _midiPlayer->currentComposition())
     {
         _currentTrack = _midiStorage.compositions().indexOf(composition);
         playNext();
