@@ -1,5 +1,7 @@
 #include "composer.h"
 #include <QDateTime>
+#include <QDebug>
+#include <cmath>
 
 Composer::Composer(QObject *parent) : QObject(parent)
 {
@@ -21,7 +23,7 @@ QMidiFile *Composer::compose()
     QDateTime cd = QDateTime::currentDateTime();
     qsrand(cd.toTime_t());
 
-    _tempo = 160 + qrand() % 15;// 120 + qrand() % 50;
+    _tempo = _tempoBase - _tempoDispersion / 2.0f + fmodf(qrand(), _tempoDispersion);
 
     _duration1_1 = 240.0f / _tempo;
     _duration1_2 = 120.0f / _tempo;
@@ -31,7 +33,25 @@ QMidiFile *Composer::compose()
 
 
     _transposition = qrand() % 12;
-    QList<int> progression = _progressions.at(qrand() % _progressions.size());
+
+    QList<int> progressionDrop1   = randFromArray(_progressionsDrop1);
+    QList<int> progressionDrop2   = randFromArray(_progressionsDrop2);
+    if (qrand() % 100 <= 60)
+    {
+        progressionDrop2 = progressionDrop1;
+    }
+
+    QList<int> progressionHollow1 = randFromArray(_progressionsHollow1);
+    QList<int> progressionHollow2 = randFromArray(_progressionsHollow2);
+    if (qrand() % 100 <= 30)
+    {
+        progressionHollow1 = progressionDrop1;
+    }
+    if (qrand() % 100 <= 60)
+    {
+        progressionHollow2 = progressionHollow1;
+    }
+
     QList<QList<int>> accomponiment = {{0}, {4}, {7}, {4}, {9}, {4}, {7}, {4}};
     QList<QList<int>> accomponimentDrive1 = {{0, 4, 7}};
     QList<QList<int>> accomponimentDrive2 = {{0}, {0}, {0, 4, 7}, {0}, {0}, {0, 4, 7}, {0}, {0, 4, 7}};
@@ -41,19 +61,28 @@ QMidiFile *Composer::compose()
 
     midi->setResolution(480);
 
-    int trackPiano = midi->createTrack();
-    midi->createMetaEvent(trackPiano, 0, QMidiEvent::MetaNumbers::TrackName, "Piano Accomp");
+    int trackAccomp1 = midi->createTrack();
+    midi->createProgramChangeEvent(trackAccomp1, 0, trackAccomp1, randFromArray(_instrumentsAccomp));
+    midi->createMetaEvent(trackAccomp1, 0, QMidiEvent::MetaNumbers::TrackName, "Accomp 1");
 
-    int trackGuitar = midi->createTrack();
-    midi->createProgramChangeEvent(trackGuitar, 0, trackGuitar, 24);
-    midi->createMetaEvent(trackGuitar, 0, QMidiEvent::MetaNumbers::TrackName, "Guitar Accomp");
+    int trackAccomp2 = midi->createTrack();
+    midi->createProgramChangeEvent(trackAccomp2, 0, trackAccomp2, randFromArray(_instrumentsAccomp));
+    midi->createMetaEvent(trackAccomp2, 0, QMidiEvent::MetaNumbers::TrackName, "Accomp 2");
 
-    int trackGuitarDrive = midi->createTrack();
-    midi->createProgramChangeEvent(trackGuitarDrive, 0, trackGuitarDrive, 28);
-    midi->createMetaEvent(trackGuitarDrive, 0, QMidiEvent::MetaNumbers::TrackName, "Guitar Drive");
+    int trackAccomp3 = midi->createTrack();
+    midi->createProgramChangeEvent(trackAccomp3, 0, trackAccomp3, randFromArray(_instrumentsAccomp));
+    midi->createMetaEvent(trackAccomp3, 0, QMidiEvent::MetaNumbers::TrackName, "Accomp 3");
+
+    int trackSolo1 = midi->createTrack();
+    midi->createProgramChangeEvent(trackSolo1, 0, trackSolo1, randFromArray(_instrumentsSolo));
+    midi->createMetaEvent(trackSolo1, 0, QMidiEvent::MetaNumbers::TrackName, "Solo 1");
+
+    int trackSolo2 = midi->createTrack();
+    midi->createProgramChangeEvent(trackSolo2, 0, trackSolo2, randFromArray(_instrumentsSolo));
+    midi->createMetaEvent(trackSolo2, 0, QMidiEvent::MetaNumbers::TrackName, "Solo 2");
 
     int trackBass = midi->createTrack();
-    midi->createProgramChangeEvent(trackBass, 0, trackBass, 33);
+    midi->createProgramChangeEvent(trackBass, 0, trackBass, randFromArray(_instrumentsBass));
     midi->createMetaEvent(trackBass, 0, QMidiEvent::MetaNumbers::TrackName, "Bass");
 
     int trackDrumkit = midi->createTrack();
@@ -64,7 +93,7 @@ QMidiFile *Composer::compose()
     midi->createTempoEvent(0, 0, _tempo);
 
 
-    //QList<int> rithm = {8, 16, 16, 8, 16, 16, 8, 16, 16, 8, 16, 16}; //Horse 1
+    //QList<float> rithm = {8, 16, 16, 8, 16, 16, 8, 16, 16, 8, 16, 16}; //Horse 1
     //QList<float> rithm = {6, 6, 6, 6, 8, 8}; //Club 1
     //QList<float> rithm = {1};                    //Basic 1
     //QList<float> rithm = {2, 2};                 //Basic 2
@@ -75,27 +104,29 @@ QMidiFile *Composer::compose()
 
     int repeats = 2; // повторы
     int progressionSteps = 4; //размер прогрессии
-    int dropSize = 4; //размер дропа
+    int dropSize1 = 2;
+    int dropSize2 = 2;
     int hollowSize1 = 2;
     int hollowSize2 = 2;
 
-    int tackts = ((dropSize + hollowSize1 + hollowSize2) * progressionSteps) * repeats;
+    int tackts = ((dropSize1 + dropSize2 + hollowSize1 + hollowSize2) * progressionSteps) * repeats;
     int tacktCouter = 0;
 
     for (int repeat = 0; repeat < repeats; ++repeat){
-        for (int i = 0; i < dropSize; ++i)
+        for (int i = 0; i < dropSize1; ++i)
         {
             for (int progressionStep = 0; progressionStep < progressionSteps; ++progressionStep){
 
 
-                makeBass(*midi, time, trackBass, progression, progressionStep, rithm, -3);
+                makeBass(*midi, time, trackBass, progressionDrop1, progressionStep, rithm, -3);
 
-                makeAccomp(*midi, time, trackGuitar, progression, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponiment);
-                makeAccomp(*midi, time, trackGuitarDrive, progression, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponimentDrive1);
+                makeAccomp(*midi, time, trackAccomp2, progressionDrop1, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponiment);
+                makeAccomp(*midi, time, trackAccomp3, progressionDrop1, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponimentDrive1);
 
-                makeMelody(*midi, time, trackPiano, 0);
-                makeMelody(*midi, time, trackPiano, 1);
-                makeMelody(*midi, time, trackGuitar, 1);
+                makeMelody(*midi, time, trackAccomp1, 0);
+                //makeMelody(*midi, time, trackPiano, 1);
+                makeMelody(*midi, time, trackSolo1, 0);
+                makeMelody(*midi, time, trackAccomp2, 1);
 
                 makeDrums(*midi, time, trackDrumkit);
 
@@ -103,7 +134,29 @@ QMidiFile *Composer::compose()
                 tacktCouter++;
                 emit updateProgress(tacktCouter * 100 / tackts);
             }
+        }
 
+        for (int i = 0; i < dropSize2; ++i)
+        {
+            for (int progressionStep = 0; progressionStep < progressionSteps; ++progressionStep){
+
+
+                makeBass(*midi, time, trackBass, progressionDrop2, progressionStep, rithm, -3);
+
+                makeAccomp(*midi, time, trackAccomp2, progressionDrop2, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponiment);
+                makeAccomp(*midi, time, trackAccomp3, progressionDrop2, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponimentDrive1);
+
+                makeMelody(*midi, time, trackAccomp1, 0);
+                //makeMelody(*midi, time, trackFlute, 0);
+                makeMelody(*midi, time, trackSolo2, 0);
+                makeMelody(*midi, time, trackAccomp2, 1);
+
+                makeDrums(*midi, time, trackDrumkit);
+
+                time += _duration1_1;
+                tacktCouter++;
+                emit updateProgress(tacktCouter * 100 / tackts);
+            }
         }
 
         for (int i = 0; i < hollowSize1; ++i)
@@ -111,11 +164,11 @@ QMidiFile *Composer::compose()
             for (int progressionStep = 0; progressionStep < progressionSteps; ++progressionStep){
 
 
-                makeBass(*midi, time, trackBass, progression, progressionStep, rithm, -3);
+                makeBass(*midi, time, trackBass, progressionHollow1, progressionStep, rithm, -3);
 
-                makeAccomp(*midi, time, trackGuitar, progression, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponiment);
+                makeAccomp(*midi, time, trackAccomp2, progressionHollow1, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponiment);
 
-                makeMelody(*midi, time, trackPiano, 0);
+                makeMelody(*midi, time, trackAccomp1, 0);
 
                 makeDrums(*midi, time, trackDrumkit);
 
@@ -130,13 +183,14 @@ QMidiFile *Composer::compose()
             for (int progressionStep = 0; progressionStep < progressionSteps; ++progressionStep){
 
 
-                makeBass(*midi, time, trackBass, progression, progressionStep, rithm, -3);
+                makeBass(*midi, time, trackBass, progressionHollow2, progressionStep, rithm, -3);
 
-                makeAccomp(*midi, time, trackGuitar, progression, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponiment);
-                makeAccomp(*midi, time, trackGuitarDrive, progression, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponimentDrive2);
+                makeAccomp(*midi, time, trackAccomp2, progressionHollow2, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponiment);
+                makeAccomp(*midi, time, trackAccomp3, progressionHollow2, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponimentDrive2);
 
-                makeMelody(*midi, time, trackPiano, 0);
-                makeMelody(*midi, time, trackGuitar, 1);
+                makeMelody(*midi, time, trackAccomp1, 0);
+                makeMelody(*midi, time, trackSolo2, 0);
+                //makeMelody(*midi, time, trackGuitar, 1);
 
                 makeDrums(*midi, time, trackDrumkit);
 
@@ -174,7 +228,7 @@ QList<float> Composer::makeRithm()
     float sum = 0.0f;
 
     while (sum < 1.0f){
-        float beat = fractionList.at(qrand() % fractionList.count());
+        float beat = randFromArray(fractionList);
 
         if (sum + beat < 1.0f)
         {
@@ -282,3 +336,14 @@ void Composer::makeDrums(QMidiFile &midi, const float &time, const int &track)
 
 
 
+
+template<typename T>
+T randFromArray(const QList<T> &list)
+{
+    if (list.isEmpty())
+    {
+        return T();
+    }
+
+    return list.at(qrand() % list.size());
+}
