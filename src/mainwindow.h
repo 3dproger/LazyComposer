@@ -73,7 +73,7 @@ private:
     QSettings* _settings = new QSettings(this);
 
     MidiStorage _midiStorage;
-    MidiPlayer* _midiPlayer = new MidiPlayer(_settings, "midi_player", this);
+    MidiPlayer _midiPlayer {_settings, "midi_player"};
 
     QIcon _iconPlay = QIcon(":/resources/images/play.svg");
 
