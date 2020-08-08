@@ -40,7 +40,19 @@ private:
     //{0, 1, 3, 5, 6, 9, 10} Harmonic minor
     QList<int> _harmony = {0, 2, 3, 5, 7, 9, 10};
 
-    QList<QList<int>> _progressions = {{5, 3, 7, 4}, {5, 5, 3, 2}, {1, 3, 5, 4}, {5, 7, 3, 2}};
+    QList<QList<int>> _progressions =
+    {
+        {5, 3, 7, 4},
+        {5, 5, 3, 2},
+        {1, 3, 5, 4},
+        {5, 7, 3, 2},
+        {1, 2, 3, 4},
+        {1, 7, 4, 3},
+        {7, 4, 3, 5},
+        {7, 4, 5, 3},
+        {1, 7, 5, 1},
+        {5, 7, 3, 4}
+    };
 
     void makeBass(QMidiFile& midi, const float& time, const int& track, const QList<int>& progression, const int& progressionStep, const QList<float>& rithm, const int& octave);
     void makeAccomp(QMidiFile& midi, const float& time, const int& track, const QList<int>& progression, const int& progressionStep, const QList<float>& rithm, const QList<QList<int>>& accomp);
