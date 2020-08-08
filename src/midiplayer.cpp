@@ -50,17 +50,18 @@ MidiPlayer::MidiPlayer(QSettings* settings, const QString& _settingsGroup, QObje
     }
 
     //Timer
-    QTimer* timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &MidiPlayer::onUpdateDevices);
-    timer->setInterval(1000);
-    timer->start();
-    timer->deleteLater();
+
+    connect(_timerUpdateDevices, &QTimer::timeout, this, &MidiPlayer::onUpdateDevices);
+    _timerUpdateDevices->setInterval(1000);
+    _timerUpdateDevices->start();
+    _timerUpdateDevices->deleteLater();
 }
 
 MidiPlayer::~MidiPlayer()
 {
     _needExit = true;
     _mutex.lock();
+    _timerUpdateDevices->stop();
     _enableSignalonDeviceDisconnected = false;
     _midiOut.stopAll();
     _midiOut.disconnect();

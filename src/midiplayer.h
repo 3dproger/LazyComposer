@@ -106,6 +106,7 @@ private:
     quint64 _currentTime = 0;
     quint64 _amendmentTime = 0;
 
+    QTimer* _timerUpdateDevices = new QTimer(this);
     QList<DeviceInfo> _devices;
     DeviceInfo _currentDevice;
 
