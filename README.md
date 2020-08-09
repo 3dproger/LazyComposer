@@ -9,4 +9,5 @@ Simple midi music generator
 * Make sure your device supports midi playback
 * You can also switch tracks and save songs to file
 * [Examples MIDI](examples)
+* <a href="https://www.youtube.com/watch?v=H6xje6YJQ-k">Video</a>
 * <b><a href="/../../releases">Download</a></b>
