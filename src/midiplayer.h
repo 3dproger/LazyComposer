@@ -2,7 +2,7 @@
 #define MIDIPLAYER_H
 
 #include <QObject>
-#include <QRunnable >
+#include <QRunnable>
 #include <QMidiFile.h>
 #include <QMidiOut.h>
 #include <QElapsedTimer>
