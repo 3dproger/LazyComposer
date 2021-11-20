@@ -2,6 +2,7 @@
 #include "defaults.h"
 #include <QDateTime>
 #include <QDebug>
+#include <QRandomGenerator>
 #include <cmath>
 
 namespace
@@ -13,10 +14,10 @@ static QString makeWord()
 
     QString word;
 
-    int syllablesCount = 2 + qrand() % 5;
+    int syllablesCount = 2 + QRandomGenerator::global()->generate() % 5;
 
     for (int i = 0; i < syllablesCount; ++i){
-        word += Syllables.at(qrand() % Syllables.count());
+        word += Syllables.at(QRandomGenerator::global()->generate() % Syllables.count());
     }
 
     return word;
@@ -67,10 +68,7 @@ QString Composer::generateTitle()
 
 QMidiFile *Composer::compose()
 {
-    QDateTime cd = QDateTime::currentDateTime();
-    qsrand(cd.toTime_t());
-
-    _tempo = _tempoBase - _tempoDispersion / 2.0f + fmodf(qrand(), _tempoDispersion);
+    _tempo = _tempoBase - _tempoDispersion / 2.0f + fmodf(QRandomGenerator::global()->generate(), _tempoDispersion);
 
     _duration1_1 = 240.0f / _tempo;
     _duration1_2 = 120.0f / _tempo;
@@ -79,22 +77,22 @@ QMidiFile *Composer::compose()
     _duration1_8 = 30.0f  / _tempo;
 
 
-    _transposition = qrand() % 12;
+    _transposition = QRandomGenerator::global()->generate() % 12;
 
     QList<int> progressionDrop1   = randFromArray(_progressionsDrop1);
     QList<int> progressionDrop2   = randFromArray(_progressionsDrop2);
-    if (qrand() % 100 <= 60)
+    if (QRandomGenerator::global()->generate() % 100 <= 60)
     {
         progressionDrop2 = progressionDrop1;
     }
 
     QList<int> progressionHollow1 = randFromArray(_progressionsHollow1);
     QList<int> progressionHollow2 = randFromArray(_progressionsHollow2);
-    if (qrand() % 100 <= 30)
+    if (QRandomGenerator::global()->generate() % 100 <= 30)
     {
         progressionHollow1 = progressionDrop1;
     }
-    if (qrand() % 100 <= 60)
+    if (QRandomGenerator::global()->generate() % 100 <= 60)
     {
         progressionHollow2 = progressionHollow1;
     }
@@ -351,7 +349,7 @@ void Composer::makeMelody(QMidiFile &midi, const float &time, const int &track, 
         float startNoteTime = preTime;
         float stopNoteTime  = startNoteTime + 240.0f / _tempo / rithm.at(i);
 
-        int note = stepHarmony(qrand() % 12) + 12 * octave;
+        int note = stepHarmony(QRandomGenerator::global()->generate() % 12) + 12 * octave;
 
         midi.createNote(track, midi.tickFromTime(startNoteTime), midi.tickFromTime(stopNoteTime), track, note, 95, 95);
 
@@ -403,5 +401,5 @@ T randFromArray(const QList<T> &list)
         return T();
     }
 
-    return list.at(qrand() % list.size());
+    return list.at(QRandomGenerator::global()->generate() % list.size());
 }

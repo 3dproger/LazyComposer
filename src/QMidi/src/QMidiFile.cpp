@@ -409,7 +409,7 @@ QMidiEvent* QMidiFile::createMetaEvent(int track, qint32 tick, int number, QByte
 QMidiEvent* QMidiFile::createTempoEvent(int track, qint32 tick, float tempo)
 {
 	long midi_tempo = 60000000L / tempo;
-	QByteArray buffer;
+    QByteArray buffer(3, 0);
 	buffer[0] = (midi_tempo >> 16) & 0xFF;
 	buffer[1] = (midi_tempo >> 8) & 0xFF;
 	buffer[2] = midi_tempo & 0xFF;

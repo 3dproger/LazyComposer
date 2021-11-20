@@ -362,8 +362,12 @@ void MidiPlayer::destroy()
 
 void MidiPlayer::onUpdateDevices()
 {
-    const auto& devices = MidiPlayer::devices();
+    const QList<MidiPlayer::DeviceInfo> devices = MidiPlayer::devices();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (!std::equal(devices.begin(), devices.end(), _devices.begin(), _devices.end()))
+#else
     if (devices != _devices)
+#endif
     {
         _devices = devices;
         emit devicesChanged();

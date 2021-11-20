@@ -48,7 +48,7 @@ public:
         bool isConnected = false;
         bool isValid = false;
 
-        bool operator==(const DeviceInfo& other)
+        bool operator==(const DeviceInfo& other) const
         {
             return id == other.id &&
                     name == other.name &&
