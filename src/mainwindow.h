@@ -5,7 +5,6 @@
 #include "midistorage.h"
 #include "midiplayer.h"
 #include "composer.h"
-#include "titlegenerator.h"
 #include <QMainWindow>
 
 namespace Ui {

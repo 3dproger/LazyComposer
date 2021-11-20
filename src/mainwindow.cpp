@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "titlegenerator.h"
 #include "global.h"
 #include "windowmidistructure.h"
 #include "defaults.h"
