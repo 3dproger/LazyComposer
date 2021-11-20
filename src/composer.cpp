@@ -7,7 +7,7 @@
 namespace
 {
 
-QString makeWord()
+static QString makeWord()
 {
     static const QStringList Syllables = {"ma", "key", "io", "bra", "e", "a", "o", "un", "oe", "tion", "wa", "ex", "es", "se", "fu", "da", "xor"};
 
@@ -22,7 +22,7 @@ QString makeWord()
     return word;
 }
 
-QString firstCharToUpper(const QString& text_)
+static QString firstCharToUpper(const QString& text_)
 {
     if (text_.isEmpty())
     {
@@ -394,9 +394,6 @@ void Composer::makeDrums(QMidiFile &midi, const float &time, const int &track)
         preTime = stopNoteTime;
     }
 }
-
-
-
 
 template<typename T>
 T randFromArray(const QList<T> &list)
