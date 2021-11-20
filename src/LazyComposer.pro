@@ -13,6 +13,8 @@ TEMPLATE = app
 
 TRANSLATIONS += \
     LazyComposer_ru_RU.ts
+CONFIG += lrelease
+CONFIG += embed_translations
 
 include(QMidi/src/QMidi.pri)
 
@@ -35,40 +37,29 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         midi.cpp \
-        titlegenerator.cpp \
         midistorage.cpp \
-        utils.cpp \
         midiplayer.cpp \
         composer.cpp \
         windowmidistructure.cpp \
-        patternstorage.cpp \
-        translator.cpp
+        patternstorage.cpp
 
 HEADERS += \
         mainwindow.h \
     midi.h \
     global.h \
-    titlegenerator.h \
     midistorage.h \
-    utils.h \
     midiplayer.h \
     composer.h \
     windowmidistructure.h \
     patternstorage.h \
-    translator.h \
     defaults.h
 
 FORMS += \
         mainwindow.ui \
         windowmidistructure.ui
 
-
-DISTFILES += \
-    LazyComposer_ru_RU.ts
-
 RESOURCES += \
-    resources.qrc \
-    translations.qrc
+    resources.qrc
 
 win32: {
     #Подключаем SSL для Windows. Соответствующий модуль должен быть установлён!!!
@@ -96,7 +87,7 @@ win32: {
             DESTDIR = $$_PRO_FILE_PWD_/../release_win64
         }
 
-        QMAKE_POST_LINK += $$(QTDIR)/bin/windeployqt --release --qmldir $$(QTDIR)/qml $$DESTDIR $$escape_expand(\\n\\t)
+        QMAKE_POST_LINK += $$(QTDIR)/bin/windeployqt --qmldir $$(QTDIR)/qml $$DESTDIR $$escape_expand(\\n\\t)
     }
 }
 

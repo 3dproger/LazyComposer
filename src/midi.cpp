@@ -1,6 +1,5 @@
 #include "midi.h"
 
-
 Midi::Midi(QObject *parent) : QObject(parent){
 
     connect(&_timer, SIGNAL(timeout()), this, SLOT(timeout()));

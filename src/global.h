@@ -4,15 +4,6 @@
 #include <QList>
 #include "QMidiFile.h"
 
-class MainWindow;
-extern MainWindow* windowMain;
-
-class WindowMidiStructure;
-extern WindowMidiStructure *windowMidiStructure;
-
-class Translator;
-extern Translator* translator;
-
 enum NoteDuration {ND_1, ND_1_2, ND_1_4, ND_1_8, ND_1_16, ND_1_32, ND_1_64};
 enum TimeSignature {TS_4_4};
 struct Note{

@@ -1,16 +1,18 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
 #include "midi.h"
 #include "midistorage.h"
 #include "midiplayer.h"
 #include "composer.h"
 #include "titlegenerator.h"
+#include <QMainWindow>
 
 namespace Ui {
 class MainWindow;
 }
+
+class WindowMidiStructure;
 
 class MainWindow : public QMainWindow
 {
@@ -71,6 +73,7 @@ private:
     QSettings* _settings = new QSettings(this);//ToDo: no use pointer
 
     MidiStorage _midiStorage;
+
     MidiPlayer* _midiPlayer = new MidiPlayer(_settings, "midi_player", this);
 
     QIcon _iconPlay = QIcon(":/resources/images/play.svg");
@@ -79,6 +82,7 @@ private:
 
     Composer* _composer = nullptr;
 
+    WindowMidiStructure* windowMidiStructure = nullptr;
 };
 
 #endif // MAINWINDOW_H

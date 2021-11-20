@@ -1,3 +1,0 @@
-[submodule "src/QMidi"]
-	path = src/QMidi
-	url = https://github.com/3dproger/QMidi.git

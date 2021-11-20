@@ -1,7 +1,41 @@
 #include "composer.h"
+#include "defaults.h"
 #include <QDateTime>
 #include <QDebug>
 #include <cmath>
+
+namespace
+{
+
+static QString makeWord()
+{
+    static const QStringList Syllables = {"ma", "key", "io", "bra", "e", "a", "o", "un", "oe", "tion", "wa", "ex", "es", "se", "fu", "da", "xor"};
+
+    QString word;
+
+    int syllablesCount = 2 + qrand() % 5;
+
+    for (int i = 0; i < syllablesCount; ++i){
+        word += Syllables.at(qrand() % Syllables.count());
+    }
+
+    return word;
+}
+
+static QString firstCharToUpper(const QString& text_)
+{
+    if (text_.isEmpty())
+    {
+        return text_;
+    }
+
+    QString text = text_;
+    text[0] = text[0].toUpper();
+
+    return text;
+}
+
+}
 
 Composer::Composer(QObject *parent) : QObject(parent)
 {
@@ -13,9 +47,22 @@ void Composer::run()
     QMidiFile* midi = compose();
     Composition* composition = new Composition();
     composition->midi = midi;
-    composition->title = _titleGenerator.generate();
+    composition->title = generateTitle();
 
     emit result(composition);
+}
+
+QString Composer::generateTitle()
+{
+    QString s = LazyComposer::APP_NAME;
+
+    s += " - ";
+
+    s += firstCharToUpper(makeWord());
+    s += " ";
+    s += firstCharToUpper(makeWord());
+
+    return s;
 }
 
 QMidiFile *Composer::compose()
@@ -61,28 +108,42 @@ QMidiFile *Composer::compose()
 
     midi->setResolution(480);
 
+    int instrument;
+
     int trackAccomp1 = midi->createTrack();
-    midi->createProgramChangeEvent(trackAccomp1, 0, trackAccomp1, randFromArray(_instrumentsAccomp));
+    instrument = randFromArray(_instrumentsAccomp);
+    qDebug() << "Accomp1:" << instrument;
+    midi->createProgramChangeEvent(trackAccomp1, 0, trackAccomp1, instrument);
     midi->createMetaEvent(trackAccomp1, 0, QMidiEvent::MetaNumbers::TrackName, "Accomp 1");
 
     int trackAccomp2 = midi->createTrack();
-    midi->createProgramChangeEvent(trackAccomp2, 0, trackAccomp2, randFromArray(_instrumentsAccomp));
+    instrument = randFromArray(_instrumentsAccomp);
+    qDebug() << "Accomp2:" << instrument;
+    midi->createProgramChangeEvent(trackAccomp2, 0, trackAccomp2, instrument);
     midi->createMetaEvent(trackAccomp2, 0, QMidiEvent::MetaNumbers::TrackName, "Accomp 2");
 
     int trackAccomp3 = midi->createTrack();
-    midi->createProgramChangeEvent(trackAccomp3, 0, trackAccomp3, randFromArray(_instrumentsAccomp));
+    instrument = randFromArray(_instrumentsAccomp);
+    qDebug() << "Accomp3:" << instrument;
+    midi->createProgramChangeEvent(trackAccomp3, 0, trackAccomp3, instrument);
     midi->createMetaEvent(trackAccomp3, 0, QMidiEvent::MetaNumbers::TrackName, "Accomp 3");
 
     int trackSolo1 = midi->createTrack();
-    midi->createProgramChangeEvent(trackSolo1, 0, trackSolo1, randFromArray(_instrumentsSolo));
+    instrument = randFromArray(_instrumentsSolo);
+    qDebug() << "Solo1:" << instrument;
+    midi->createProgramChangeEvent(trackSolo1, 0, trackSolo1, instrument);
     midi->createMetaEvent(trackSolo1, 0, QMidiEvent::MetaNumbers::TrackName, "Solo 1");
 
     int trackSolo2 = midi->createTrack();
-    midi->createProgramChangeEvent(trackSolo2, 0, trackSolo2, randFromArray(_instrumentsSolo));
+    instrument = randFromArray(_instrumentsSolo);
+    qDebug() << "Solo2:" << instrument;
+    midi->createProgramChangeEvent(trackSolo2, 0, trackSolo2, instrument);
     midi->createMetaEvent(trackSolo2, 0, QMidiEvent::MetaNumbers::TrackName, "Solo 2");
 
     int trackBass = midi->createTrack();
-    midi->createProgramChangeEvent(trackBass, 0, trackBass, randFromArray(_instrumentsBass));
+    instrument = randFromArray(_instrumentsBass);
+    qDebug() << "Bass:" << instrument;
+    midi->createProgramChangeEvent(trackBass, 0, trackBass, instrument);
     midi->createMetaEvent(trackBass, 0, QMidiEvent::MetaNumbers::TrackName, "Bass");
 
     int trackDrumkit = midi->createTrack();
@@ -126,7 +187,7 @@ QMidiFile *Composer::compose()
                 makeMelody(*midi, time, trackAccomp1, 0);
                 //makeMelody(*midi, time, trackPiano, 1);
                 makeMelody(*midi, time, trackSolo1, 0);
-                makeMelody(*midi, time, trackAccomp2, 1);
+                makeMelody(*midi, time, trackAccomp2, 0);
 
                 makeDrums(*midi, time, trackDrumkit);
 
@@ -149,7 +210,7 @@ QMidiFile *Composer::compose()
                 makeMelody(*midi, time, trackAccomp1, 0);
                 //makeMelody(*midi, time, trackFlute, 0);
                 makeMelody(*midi, time, trackSolo2, 0);
-                makeMelody(*midi, time, trackAccomp2, 1);
+                makeMelody(*midi, time, trackAccomp2, randFromArray(QList<int>{0, 1}));
 
                 makeDrums(*midi, time, trackDrumkit);
 
@@ -188,7 +249,7 @@ QMidiFile *Composer::compose()
                 makeAccomp(*midi, time, trackAccomp2, progressionHollow2, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponiment);
                 makeAccomp(*midi, time, trackAccomp3, progressionHollow2, progressionStep, {8, 8, 8, 8, 8, 8, 8, 8}, accomponimentDrive2);
 
-                makeMelody(*midi, time, trackAccomp1, 0);
+                makeMelody(*midi, time, trackAccomp1, randFromArray(QList<int>{0, 1}));
                 makeMelody(*midi, time, trackSolo2, 0);
                 //makeMelody(*midi, time, trackGuitar, 1);
 
@@ -333,9 +394,6 @@ void Composer::makeDrums(QMidiFile &midi, const float &time, const int &track)
         preTime = stopNoteTime;
     }
 }
-
-
-
 
 template<typename T>
 T randFromArray(const QList<T> &list)

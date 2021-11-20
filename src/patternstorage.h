@@ -1,8 +1,8 @@
 #ifndef PATTERNSTORAGE_H
 #define PATTERNSTORAGE_H
 
-#include <QObject>
 #include "global.h"
+#include <QObject>
 
 struct Sequence{
     QString name;

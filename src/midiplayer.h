@@ -1,12 +1,12 @@
 #ifndef MIDIPLAYER_H
 #define MIDIPLAYER_H
 
-#include <QObject>
-#include <QRunnable >
+#include "global.h"
 #include <QMidiFile.h>
 #include <QMidiOut.h>
+#include <QObject>
+#include <QRunnable>
 #include <QElapsedTimer>
-#include "global.h"
 #include <QMutex>
 #include <QSettings>
 #include <QTimer>
@@ -84,7 +84,6 @@ public slots:
 
 private slots:
     void onUpdateDevices();
-    void onDeviceDisconnected(QString deviceId);
 
 private:
     static quint64 calcTime(QMidiFile* _midiFile);
@@ -109,8 +108,6 @@ private:
     QTimer* _timerUpdateDevices = new QTimer(this);
     QList<DeviceInfo> _devices;
     DeviceInfo _currentDevice;
-
-    bool _enableSignalonDeviceDisconnected = true;
 
     QSettings* _settings = nullptr;
     QString _settingsGroup;

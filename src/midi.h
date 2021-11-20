@@ -1,10 +1,10 @@
 #ifndef MIDI_H
 #define MIDI_H
 
-#include <QObject>
+#include "global.h"
 #include <QMidiOut.h>
 #include <QMidiFile.h>
-#include "global.h"
+#include <QObject>
 #include <QTimer>
 
 class Midi : public QObject

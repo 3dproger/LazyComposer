@@ -7,8 +7,6 @@ MidiPlayer::MidiPlayer(QSettings* settings, const QString& _settingsGroup, QObje
 {
     setAutoDelete(true);
 
-    connect(&_midiOut, &QMidiOut::disconnected, this, &MidiPlayer::onDeviceDisconnected);
-
     //Trying to connect to last opened device
     const QList<DeviceInfo>& devices = MidiPlayer::devices();
 
@@ -63,7 +61,6 @@ MidiPlayer::~MidiPlayer()
     _needExit = true;
     _mutex.lock();
     _timerUpdateDevices->stop();
-    _enableSignalonDeviceDisconnected = false;
     _midiOut.stopAll();
     _midiOut.disconnect();
 
@@ -370,23 +367,6 @@ void MidiPlayer::onUpdateDevices()
     {
         _devices = devices;
         emit devicesChanged();
-    }
-}
-
-void MidiPlayer::onDeviceDisconnected(QString deviceId)
-{
-    //TODO: Maybe need mutex
-
-    if (_currentDevice.id == deviceId)
-    {
-        //setPause(true);
-        _currentDevice.isConnected = false;
-
-        if (_enableSignalonDeviceDisconnected)
-        {
-            emit error(Error(ErrorType::CurrentDeviceDisconnected,
-                             tr("The current MIDI-device is disconnected. Playback stopped. Select another MIDI-device to continue playback")));
-        }
     }
 }
 

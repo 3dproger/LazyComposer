@@ -1,12 +1,7 @@
 #include "mainwindow.h"
-#include <QApplication>
-#include "windowmidistructure.h"
-#include "translator.h"
 #include "defaults.h"
-
-WindowMidiStructure* windowMidiStructure = nullptr;
-MainWindow* windowMain = nullptr;
-Translator* translator = nullptr;
+#include <QApplication>
+#include <QTranslator>
 
 int main(int argc, char *argv[])
 {
@@ -17,18 +12,18 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
-    translator = new Translator();
+    QTranslator translator;
+    const QStringList uiLanguages = QLocale::system().uiLanguages();
+    for (const QString &locale : uiLanguages) {
+        const QString baseName = "LazyComposer_" + QLocale(locale).name();
+        if (translator.load(":/i18n/" + baseName)) {
+            a.installTranslator(&translator);
+            break;
+        }
+    }
 
-    windowMain = new MainWindow();
-    windowMidiStructure = new WindowMidiStructure(windowMain);
+    MainWindow windowMain;
+    windowMain.show();
 
-
-    windowMain->show();
-
-    int result = a.exec();
-
-    delete windowMain;
-    delete translator;
-
-    return result;
+    return a.exec();
 }
