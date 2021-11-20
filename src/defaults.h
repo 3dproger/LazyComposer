@@ -9,7 +9,7 @@ const QString ORGANIZATION_NAME = "Axel_k";
 const QString ORGANIZATION_DOMAIN = "https://github.com/3dproger";
 
 const QString APP_VERSION = "1.2";
-const QString APP_YEAR = "2019-2020";
+const QString APP_YEAR = "2019-2021";
 }
 
 

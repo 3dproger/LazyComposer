@@ -1,11 +1,10 @@
 #ifndef COMPOSER_H
 #define COMPOSER_H
 
-#include <QObject>
-#include "QMidiFile.h"
 #include "global.h"
+#include <QMidiFile.h>
+#include <QObject>
 #include <QRunnable>
-#include "titlegenerator.h"
 
 /*
 Piano:
@@ -183,12 +182,11 @@ signals:
     void result(Composition* composition);
     void updateProgress(int percentage);
 
-public slots:
+protected:
+    static QString generateTitle();
 
 private:
     QMidiFile* compose();
-
-    TitleGenerator _titleGenerator;
 
     int _noteStart = 55;
     int _transposition = 0;

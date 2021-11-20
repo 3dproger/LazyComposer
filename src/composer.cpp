@@ -1,8 +1,41 @@
 #include "composer.h"
+#include "defaults.h"
 #include <QDateTime>
 #include <QDebug>
 #include <cmath>
-#include <tuple>
+
+namespace
+{
+
+QString makeWord()
+{
+    static const QStringList Syllables = {"ma", "key", "io", "bra", "e", "a", "o", "un", "oe", "tion", "wa", "ex", "es", "se", "fu", "da", "xor"};
+
+    QString word;
+
+    int syllablesCount = 2 + qrand() % 5;
+
+    for (int i = 0; i < syllablesCount; ++i){
+        word += Syllables.at(qrand() % Syllables.count());
+    }
+
+    return word;
+}
+
+QString firstCharToUpper(const QString& text_)
+{
+    if (text_.isEmpty())
+    {
+        return text_;
+    }
+
+    QString text = text_;
+    text[0] = text[0].toUpper();
+
+    return text;
+}
+
+}
 
 Composer::Composer(QObject *parent) : QObject(parent)
 {
@@ -14,9 +47,22 @@ void Composer::run()
     QMidiFile* midi = compose();
     Composition* composition = new Composition();
     composition->midi = midi;
-    composition->title = _titleGenerator.generate();
+    composition->title = generateTitle();
 
     emit result(composition);
+}
+
+QString Composer::generateTitle()
+{
+    QString s = LazyComposer::APP_NAME;
+
+    s += " - ";
+
+    s += firstCharToUpper(makeWord());
+    s += " ";
+    s += firstCharToUpper(makeWord());
+
+    return s;
 }
 
 QMidiFile *Composer::compose()

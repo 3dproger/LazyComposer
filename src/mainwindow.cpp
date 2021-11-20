@@ -1,15 +1,15 @@
 #include "mainwindow.h"
-#include "titlegenerator.h"
 #include "ui_mainwindow.h"
+#include "titlegenerator.h"
+#include "global.h"
+#include "windowmidistructure.h"
+#include "defaults.h"
+#include <QMessageBox>
+#include <QDebug>
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QThreadPool>
 #include <cmath>
-#include "global.h"
-#include "windowmidistructure.h"
-#include <QMessageBox>
-#include "defaults.h"
-#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -145,6 +145,11 @@ void MainWindow::on_btnStructure_clicked()
     Composition* composition = currentSelectedComposition();
     if (composition)
     {
+        if (!windowMidiStructure)
+        {
+            windowMidiStructure = new WindowMidiStructure(this);
+        }
+
         windowMidiStructure->load(composition);
         windowMidiStructure->show();
     }

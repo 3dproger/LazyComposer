@@ -1,12 +1,7 @@
 #include "mainwindow.h"
+#include "defaults.h"
 #include <QApplication>
 #include <QTranslator>
-#include "windowmidistructure.h"
-#include "defaults.h"
-
-WindowMidiStructure* windowMidiStructure = nullptr;
-MainWindow* windowMain = nullptr;
-Translator* translator = nullptr;
 
 int main(int argc, char *argv[])
 {
@@ -27,15 +22,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    windowMain = new MainWindow();
-    windowMidiStructure = new WindowMidiStructure(windowMain);
+    MainWindow windowMain;
+    windowMain.show();
 
-
-    windowMain->show();
-
-    int result = a.exec();
-
-    delete windowMain;
-
-    return result;
+    return a.exec();
 }

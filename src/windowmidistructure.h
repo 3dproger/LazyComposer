@@ -1,10 +1,10 @@
 #ifndef WINDOWMIDISTRUCTURE_H
 #define WINDOWMIDISTRUCTURE_H
 
+#include "global.h"
+#include <QMidiFile.h>
 #include <QMainWindow>
 #include <QStandardItemModel>
-#include "QMidiFile.h"
-#include "global.h"
 
 namespace Ui {
 class WindowMidiStructure;

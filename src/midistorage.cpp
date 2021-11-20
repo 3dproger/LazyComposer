@@ -1,5 +1,5 @@
 #include "midistorage.h"
-#include "utils.h"
+#include <QFileInfo>
 
 MidiStorage::MidiStorage(QObject *parent) : QObject(parent)
 {
@@ -24,7 +24,7 @@ void MidiStorage::append(QString fileName)
     Composition* composition = new Composition();
 
     composition->midi = midiFile;
-    composition->title = Utils::getFileNameFromPath(fileName);
+    composition->title = QFileInfo(fileName).fileName();
 
     append(composition);
 }
@@ -54,7 +54,6 @@ Composition *MidiStorage::composition(const QString &title) const
             return composition;
         }
     }
-
 
     return nullptr;
 }

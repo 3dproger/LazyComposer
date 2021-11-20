@@ -1,9 +1,9 @@
 #ifndef MIDISTORAGE_H
 #define MIDISTORAGE_H
 
-#include <QObject>
-#include <QMidiFile.h>
 #include "global.h"
+#include <QMidiFile.h>
+#include <QObject>
 
 class MidiStorage : public QObject
 {
@@ -25,7 +25,6 @@ public slots:
 
 private:
     QList<Composition*> _compositions;
-
 };
 
 #endif // MIDISTORAGE_H

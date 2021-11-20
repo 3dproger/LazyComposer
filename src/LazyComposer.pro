@@ -37,9 +37,7 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         midi.cpp \
-        titlegenerator.cpp \
         midistorage.cpp \
-        utils.cpp \
         midiplayer.cpp \
         composer.cpp \
         windowmidistructure.cpp \
@@ -49,9 +47,7 @@ HEADERS += \
         mainwindow.h \
     midi.h \
     global.h \
-    titlegenerator.h \
     midistorage.h \
-    utils.h \
     midiplayer.h \
     composer.h \
     windowmidistructure.h \

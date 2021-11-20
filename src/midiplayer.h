@@ -1,12 +1,12 @@
 #ifndef MIDIPLAYER_H
 #define MIDIPLAYER_H
 
-#include <QObject>
-#include <QRunnable>
+#include "global.h"
 #include <QMidiFile.h>
 #include <QMidiOut.h>
+#include <QObject>
+#include <QRunnable>
 #include <QElapsedTimer>
-#include "global.h"
 #include <QMutex>
 #include <QSettings>
 #include <QTimer>
