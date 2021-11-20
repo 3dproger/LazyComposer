@@ -96,7 +96,7 @@ win32: {
             DESTDIR = $$_PRO_FILE_PWD_/../release_win64
         }
 
-        QMAKE_POST_LINK += $$(QTDIR)/bin/windeployqt --release --qmldir $$(QTDIR)/qml $$DESTDIR $$escape_expand(\\n\\t)
+        QMAKE_POST_LINK += $$(QTDIR)/bin/windeployqt --qmldir $$(QTDIR)/qml $$DESTDIR $$escape_expand(\\n\\t)
     }
 }
 
