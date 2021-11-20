@@ -12,3 +12,8 @@ Simple midi music generator
 * Just launch the program and enjoy the masterpiece music!
 * Make sure your device supports midi playback
 * You can also switch tracks and save songs to file
+
+# How to build
+1. Install Qt 5 or 6
+2. Clone repo
+3. Open src/LazyComposer.pro in QtCreator and build
