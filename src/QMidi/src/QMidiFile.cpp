@@ -829,7 +829,7 @@ bool QMidiFile::load(QString filename)
 					case 0xF0:
 					case 0xF7: {
 						int data_length = read_variable_length_quantity(&in) + 1;
-						QByteArray data;
+                        QByteArray data(1, 0);
 						data[0] = status;
 						data += in.read(data_length - 1);
 
