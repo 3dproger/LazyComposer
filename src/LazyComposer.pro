@@ -13,6 +13,8 @@ TEMPLATE = app
 
 TRANSLATIONS += \
     LazyComposer_ru_RU.ts
+CONFIG += lrelease
+CONFIG += embed_translations
 
 include(QMidi/src/QMidi.pri)
 
@@ -41,8 +43,7 @@ SOURCES += \
         midiplayer.cpp \
         composer.cpp \
         windowmidistructure.cpp \
-        patternstorage.cpp \
-        translator.cpp
+        patternstorage.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -55,20 +56,14 @@ HEADERS += \
     composer.h \
     windowmidistructure.h \
     patternstorage.h \
-    translator.h \
     defaults.h
 
 FORMS += \
         mainwindow.ui \
         windowmidistructure.ui
 
-
-DISTFILES += \
-    LazyComposer_ru_RU.ts
-
 RESOURCES += \
-    resources.qrc \
-    translations.qrc
+    resources.qrc
 
 win32: {
     #Подключаем SSL для Windows. Соответствующий модуль должен быть установлён!!!
